@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { getRedis } from "@/lib/redis";
 import { getLink, getStats, buildDailySeries, type LinkStats } from "@/lib/links";
-import { webUrl, type Target } from "@/lib/youtube";
+import { webUrl, type Target, VIDEO_ID_RE, HANDLE_RE, CHANNEL_ID_RE } from "@/lib/youtube";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = { referrer: "no-referrer" };
 
 function NotFound() {
   return (
@@ -33,6 +36,14 @@ export default async function StatsPage({
     return <NotFound />;
   }
 
+  const validId =
+    typeof link.id === "string" &&
+    (link.kind === "video"
+      ? VIDEO_ID_RE.test(link.id)
+      : link.kind === "channel" &&
+        (HANDLE_RE.test(link.id) || CHANNEL_ID_RE.test(link.id)));
+  if (!validId) return <NotFound />;
+
   let stats: LinkStats = {
     total: 0,
     daily: {},
@@ -51,7 +62,7 @@ export default async function StatsPage({
     <main className="wrap">
       <h1>Link stats</h1>
       <p className="tagline">
-        <code>/s/{code}</code> → <a href={targetUrl}>{targetUrl}</a>
+        <code>/s/{code}</code> → <a href={targetUrl} rel="noreferrer">{targetUrl}</a>
       </p>
 
       <section className="stat-grid">
