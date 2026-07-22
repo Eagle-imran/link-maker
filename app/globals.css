@@ -75,4 +75,13 @@ h1 { margin: 0; font-size: 2rem; }
   cursor: pointer;
 }
 
+.info { margin-top: 16px; border-top: 1px solid #2a2a2a; padding-top: 20px; }
+.info h2 { margin: 0 0 10px; font-size: 1.15rem; }
+.info p, .info ol { margin: 0 0 10px; color: var(--muted); line-height: 1.6; }
+.info ol { padding-left: 22px; }
+.info li { margin-bottom: 4px; }
+.info li::marker { color: var(--accent); font-weight: 600; }
+.info strong { color: var(--fg); }
+.fine { font-size: 0.85rem; }
+
 footer { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 12px; }

@@ -103,6 +103,35 @@ export default function Home() {
         </div>
       )}
 
+      <section className="info">
+        <h2>Why smart links?</h2>
+        <p>
+          When someone taps your YouTube link inside Instagram or TikTok, it
+          opens in the app&apos;s built-in browser — where they&apos;re{" "}
+          <strong>not logged in to YouTube</strong>. They can&apos;t subscribe,
+          like, or comment. Most just leave.
+        </p>
+        <p>
+          A smart link skips the in-app browser and opens your video or channel
+          in the <strong>YouTube app</strong>, where viewers are already logged
+          in. One tap to subscribe — more subscribers and watch time from the
+          exact same clicks.
+        </p>
+      </section>
+
+      <section className="info">
+        <h2>How it works</h2>
+        <ol>
+          <li>Paste any YouTube link — video, Short, or channel</li>
+          <li>Copy your smart link</li>
+          <li>Use it in your bio, stories, and captions</li>
+        </ol>
+        <p className="fine">
+          If the YouTube app isn&apos;t installed, the link falls back to
+          youtube.com — nobody hits a dead end.
+        </p>
+      </section>
+
       <footer>
         Free · no tracking · works on Instagram, TikTok &amp; more
       </footer>
