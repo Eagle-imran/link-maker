@@ -31,6 +31,13 @@ describe("renderRedirectPage", () => {
     const subHtml = renderRedirectPage({ kind: "channel", id: "@MrBeast" }, true);
     expect(subHtml).toContain("sub_confirmation=1");
   });
+
+  it("renders the fallback page for an unvalidated Target (defense-in-depth)", () => {
+    const evil = { kind: "video", id: "x</script><script>alert(1)</script>" } as Target;
+    const html = renderRedirectPage(evil);
+    expect(html).not.toContain("alert(1)");
+    expect(html).toContain("https://www.youtube.com");
+  });
 });
 
 describe("renderFallbackPage", () => {
