@@ -81,12 +81,16 @@ export function renderFallbackPage(): string {
   );
 }
 
-export function htmlResponse(html: string): Response {
+export function htmlResponse(
+  html: string,
+  cacheControl = "public, max-age=3600, s-maxage=31536000, immutable"
+): Response {
   return new Response(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      // Browser caches 1h; Vercel edge caches 1 year (content is immutable per ID).
-      "Cache-Control": "public, max-age=3600, s-maxage=31536000, immutable",
+      // Default: browser 1h, Vercel edge 1 year (content immutable per ID).
+      // /s/ passes "no-store" — every click must reach the function to count.
+      "Cache-Control": cacheControl,
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "no-referrer",
     },

@@ -13,6 +13,7 @@ import {
   checkRateLimit,
 } from "@/lib/links";
 import { FakeRedis } from "./fake-redis";
+import { deferOrRun } from "@/lib/defer";
 
 describe("randomCode / randomStatsKey", () => {
   it("generates 8-char lowercase alphanumeric codes", () => {
@@ -160,5 +161,15 @@ describe("checkRateLimit", () => {
     expect(await checkRateLimit(redis, "1.2.3.4")).toBe(false);
     expect(await checkRateLimit(redis, "5.6.7.8")).toBe(true); // other IP unaffected
     expect(redis.ttls.get("ratelimit:1.2.3.4")).toBe(3600);
+  });
+});
+
+describe("deferOrRun", () => {
+  it("runs the fn inline outside a Next request scope", async () => {
+    let ran = false;
+    await deferOrRun(async () => {
+      ran = true;
+    });
+    expect(ran).toBe(true);
   });
 });

@@ -76,4 +76,10 @@ describe("htmlResponse", () => {
     expect(res.headers.get("Referrer-Policy")).toBe("no-referrer");
     expect(await res.text()).toBe("<p>hi</p>");
   });
+
+  it("accepts a cache-control override", () => {
+    const res = htmlResponse("<p>hi</p>", "no-store");
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
+  });
 });
