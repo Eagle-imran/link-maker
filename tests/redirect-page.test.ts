@@ -52,6 +52,8 @@ describe("htmlResponse", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toBe("text/html; charset=utf-8");
     expect(res.headers.get("Cache-Control")).toContain("s-maxage");
+    expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    expect(res.headers.get("Referrer-Policy")).toBe("no-referrer");
     expect(await res.text()).toBe("<p>hi</p>");
   });
 });

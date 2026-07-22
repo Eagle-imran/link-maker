@@ -24,9 +24,11 @@ export default function Home() {
   useEffect(() => {
     setCopied(false);
     clearTimeout(copyTimer.current);
+    return () => clearTimeout(copyTimer.current);
   }, [link]);
 
   async function copy() {
+    let ok = true;
     try {
       await navigator.clipboard.writeText(link);
     } catch {
@@ -37,9 +39,10 @@ export default function Home() {
       ta.style.opacity = "0";
       document.body.appendChild(ta);
       ta.select();
-      document.execCommand("copy");
+      ok = document.execCommand("copy");
       ta.remove();
     }
+    if (!ok) return;
     setCopied(true);
     clearTimeout(copyTimer.current);
     copyTimer.current = setTimeout(() => setCopied(false), 1500);
@@ -88,7 +91,7 @@ export default function Home() {
       {target && (
         <div className="result">
           <code>{link}</code>
-          <button type="button" onClick={copy}>
+          <button type="button" onClick={copy} aria-live="polite">
             {copied ? "Copied!" : "Copy"}
           </button>
         </div>

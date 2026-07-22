@@ -74,6 +74,8 @@ export function htmlResponse(html: string): Response {
       "Content-Type": "text/html; charset=utf-8",
       // Browser caches 1h; Vercel edge caches 1 year (content is immutable per ID).
       "Cache-Control": "public, max-age=3600, s-maxage=31536000, immutable",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "no-referrer",
     },
   });
 }
