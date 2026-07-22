@@ -84,7 +84,13 @@ export default function Home() {
             checked={sub}
             onChange={(e) => setSub(e.target.checked)}
           />
-          <span>Show the subscribe prompt when it opens</span>
+          <span>
+            Ask visitors to confirm subscribing
+            <small>
+              Desktop browsers only — in the YouTube app, viewers land on your
+              channel with the Subscribe button
+            </small>
+          </span>
         </label>
       )}
 

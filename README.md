@@ -13,7 +13,10 @@ logged in, so they can subscribe, like, and comment.
 - **iOS:** `vnd.youtube://` scheme with a 1.5 s timer fallback to the web URL,
   cancelled if the app takes over.
 - **Desktop:** immediate redirect to youtube.com.
-- `?sub=1` on channel links adds YouTube's subscribe-confirmation prompt.
+- `?sub=1` on channel links adds YouTube's subscribe-confirmation prompt
+  (`sub_confirmation=1`). Note: the prompt is a **web-only** YouTube feature —
+  desktop browsers show it, but the native apps ignore the parameter and open
+  the channel page directly.
 
 No accounts, no tracking, no database.
 
