@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { parseYouTubeUrl } from "@/lib/youtube";
 
 export default function Home() {
   const [input, setInput] = useState("");
   const [sub, setSub] = useState(false);
   const [copied, setCopied] = useState(false);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const target = useMemo(() => parseYouTubeUrl(input), [input]);
   const showError = input.trim() !== "" && target === null;
@@ -19,6 +20,11 @@ export default function Home() {
       ? `${origin}/v/${target.id}`
       : `${origin}/c/${target.id}${sub ? "?sub=1" : ""}`;
   }, [target, sub]);
+
+  useEffect(() => {
+    setCopied(false);
+    clearTimeout(copyTimer.current);
+  }, [link]);
 
   async function copy() {
     try {
@@ -35,7 +41,8 @@ export default function Home() {
       ta.remove();
     }
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopied(false), 1500);
   }
 
   return (
@@ -56,11 +63,15 @@ export default function Home() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           autoFocus
+          aria-invalid={showError}
+          aria-describedby={showError ? "url-error" : undefined}
         />
       </label>
 
       {showError && (
-        <p className="error">That doesn&apos;t look like a YouTube link.</p>
+        <p className="error" id="url-error" role="alert">
+          That doesn&apos;t look like a YouTube link.
+        </p>
       )}
 
       {target?.kind === "channel" && (
@@ -77,7 +88,9 @@ export default function Home() {
       {target && (
         <div className="result">
           <code>{link}</code>
-          <button onClick={copy}>{copied ? "Copied!" : "Copy"}</button>
+          <button type="button" onClick={copy}>
+            {copied ? "Copied!" : "Copy"}
+          </button>
         </div>
       )}
 
