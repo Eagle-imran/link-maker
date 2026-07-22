@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { parseYouTubeUrl } from "@/lib/youtube";
+import {
+  parseYouTubeUrl,
+  webUrl,
+  iosUrl,
+  androidIntentUrl,
+  type Target,
+} from "@/lib/youtube";
 
 const VID = "dQw4w9WgXcQ";
 
@@ -56,5 +62,44 @@ describe("parseYouTubeUrl — rejects", () => {
     ["https://www.youtube.com/playlist?list=PL123"],
   ])("returns null for %s", (input) => {
     expect(parseYouTubeUrl(input)).toBeNull();
+  });
+});
+
+const videoT: Target = { kind: "video", id: VID };
+const handleT: Target = { kind: "channel", id: "@MrBeast" };
+const chanIdT: Target = { kind: "channel", id: "UCX6OQ3DkcsbYNE6H8uQQuVA" };
+
+describe("deep-link builders", () => {
+  it("builds web URLs", () => {
+    expect(webUrl(videoT)).toBe(`https://www.youtube.com/watch?v=${VID}`);
+    expect(webUrl(handleT)).toBe("https://www.youtube.com/@MrBeast");
+    expect(webUrl(chanIdT)).toBe(
+      "https://www.youtube.com/channel/UCX6OQ3DkcsbYNE6H8uQQuVA"
+    );
+  });
+
+  it("appends sub_confirmation for channels when sub=true", () => {
+    expect(webUrl(handleT, true)).toBe(
+      "https://www.youtube.com/@MrBeast?sub_confirmation=1"
+    );
+  });
+
+  it("ignores sub for videos", () => {
+    expect(webUrl(videoT, true)).toBe(`https://www.youtube.com/watch?v=${VID}`);
+  });
+
+  it("builds iOS URLs by swapping the scheme", () => {
+    expect(iosUrl(videoT)).toBe(`vnd.youtube://www.youtube.com/watch?v=${VID}`);
+    expect(iosUrl(handleT, true)).toBe(
+      "vnd.youtube://www.youtube.com/@MrBeast?sub_confirmation=1"
+    );
+  });
+
+  it("builds Android intent URLs with an encoded fallback", () => {
+    expect(androidIntentUrl(videoT)).toBe(
+      `intent://www.youtube.com/watch?v=${VID}#Intent;scheme=https;package=com.google.android.youtube;S.browser_fallback_url=${encodeURIComponent(
+        `https://www.youtube.com/watch?v=${VID}`
+      )};end`
+    );
   });
 });

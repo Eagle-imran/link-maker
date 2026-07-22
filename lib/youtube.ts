@@ -47,3 +47,25 @@ function channel(id: string | undefined): Target | null {
     ? { kind: "channel", id }
     : null;
 }
+
+export function webUrl(t: Target, sub = false): string {
+  return `https://www.youtube.com${ytPath(t, sub)}`;
+}
+
+export function iosUrl(t: Target, sub = false): string {
+  return `vnd.youtube://www.youtube.com${ytPath(t, sub)}`;
+}
+
+export function androidIntentUrl(t: Target, sub = false): string {
+  return (
+    `intent://www.youtube.com${ytPath(t, sub)}` +
+    `#Intent;scheme=https;package=com.google.android.youtube` +
+    `;S.browser_fallback_url=${encodeURIComponent(webUrl(t, sub))};end`
+  );
+}
+
+function ytPath(t: Target, sub: boolean): string {
+  if (t.kind === "video") return `/watch?v=${t.id}`;
+  const base = t.id.startsWith("@") ? `/${t.id}` : `/channel/${t.id}`;
+  return sub ? `${base}?sub_confirmation=1` : base;
+}
