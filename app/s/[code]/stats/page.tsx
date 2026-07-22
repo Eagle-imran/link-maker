@@ -5,7 +5,7 @@ import { webUrl, type Target, VIDEO_ID_RE, HANDLE_RE, CHANNEL_ID_RE } from "@/li
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { referrer: "no-referrer" };
+export const metadata: Metadata = { referrer: "no-referrer", robots: { index: false } };
 
 function NotFound() {
   return (
@@ -44,14 +44,20 @@ export default async function StatsPage({
         (HANDLE_RE.test(link.id) || CHANNEL_ID_RE.test(link.id)));
   if (!validId) return <NotFound />;
 
-  let stats: LinkStats = {
-    total: 0,
-    daily: {},
-    devices: { android: 0, ios: 0, desktop: 0 },
-  };
+  let stats: LinkStats | null = null;
   try {
     stats = await getStats(getRedis(), code);
-  } catch {}
+  } catch {
+    stats = null;
+  }
+  if (!stats) {
+    return (
+      <main className="wrap">
+        <h1>Link stats</h1>
+        <p className="tagline">Stats are temporarily unavailable — try again in a minute.</p>
+      </main>
+    );
+  }
 
   const series = buildDailySeries(stats.daily, 30);
   const max = Math.max(1, ...series.map((d) => d.count));

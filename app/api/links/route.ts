@@ -43,6 +43,7 @@ export async function POST(req: Request) {
     const { code, statsKey } = await createLink(redis, target, sub);
     const origin = new URL(req.url).origin;
     return Response.json({
+      code,
       shortUrl: `${origin}/s/${code}`,
       statsUrl: `${origin}/s/${code}/stats?key=${statsKey}`,
     });

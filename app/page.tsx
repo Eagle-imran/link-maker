@@ -99,7 +99,7 @@ export default function Home() {
         return;
       }
       setCreated(json);
-      const code = json.shortUrl.split("/").pop() as string;
+      const code = json.code as string;
       const entry: SavedLink = {
         code,
         shortUrl: json.shortUrl,
