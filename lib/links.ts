@@ -106,7 +106,10 @@ export async function recordClick(
   code: string,
   device: Device
 ): Promise<void> {
+  if (!CODE_RE.test(code)) return; // never build redis keys from unvalidated input
   const key = `clicks:${code}`;
+  // Three independent increments: partial failure can desync total vs breakdowns.
+  // Accepted for aggregate-only stats; Task 3's adapter may pipeline these.
   await Promise.all([
     redis.hincrby(key, "total", 1),
     redis.hincrby(key, `d:${todayUTC()}`, 1),
@@ -147,6 +150,9 @@ export async function checkRateLimit(
 ): Promise<boolean> {
   const key = `ratelimit:${ip}`;
   const n = await redis.incr(key);
+  // Non-atomic INCR+EXPIRE: a crash between them could leave one IP's counter
+  // without a TTL (permanent lockout for that IP). Accepted: single-IP blast
+  // radius, one-line window, free tier has no SET..EX..NX pipeline pressure.
   if (n === 1) await redis.expire(key, windowSeconds);
   return n <= limit;
 }

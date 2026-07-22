@@ -103,6 +103,30 @@ describe("createLink / getLink", () => {
     await redis.set("link:abcd1234", "{not json");
     expect(await getLink(redis, "abcd1234")).toBeNull();
   });
+
+  it("retries on code collision and succeeds", async () => {
+    const redis = new FakeRedis();
+    let calls = 0;
+    const set = redis.set.bind(redis);
+    redis.set = async (k, v, opts) => (++calls <= 2 ? null : set(k, v, opts));
+    const { code } = await createLink(redis, { kind: "video", id: "dQw4w9WgXcQ" }, false);
+    expect(calls).toBe(3);
+    expect(await getLink(redis, code)).not.toBeNull();
+  });
+
+  it("throws after 5 failed allocation attempts", async () => {
+    const redis = new FakeRedis();
+    redis.set = async () => null;
+    await expect(
+      createLink(redis, { kind: "video", id: "dQw4w9WgXcQ" }, false)
+    ).rejects.toThrow("could not allocate");
+  });
+
+  it("recordClick ignores malformed codes", async () => {
+    const redis = new FakeRedis();
+    await recordClick(redis, "../evil", "android");
+    expect(redis.hashes.size).toBe(0);
+  });
 });
 
 describe("recordClick / getStats", () => {
