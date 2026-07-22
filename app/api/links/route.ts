@@ -2,6 +2,9 @@ import { parseYouTubeUrl } from "@/lib/youtube";
 import { createLink, checkRateLimit } from "@/lib/links";
 import { getRedis } from "@/lib/redis";
 
+// Vercel overwrites x-forwarded-for (clients cannot spoof it there). Behind a
+// different proxy this becomes attacker-controllable — acceptable here because
+// the rate limiter is anti-abuse, not a security boundary.
 function clientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   return fwd ? fwd.split(",")[0].trim() : "unknown";
