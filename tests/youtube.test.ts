@@ -15,6 +15,7 @@ describe("parseYouTubeUrl — videos", () => {
     [`https://www.youtube.com/live/${VID}`],
     [`youtube.com/watch?v=${VID}`], // no scheme
     [`  https://youtu.be/${VID}  `], // whitespace
+    [`https://YOUTUBE.COM/watch?v=${VID}`], // uppercase host
   ])("parses %s", (input) => {
     expect(parseYouTubeUrl(input)).toEqual({ kind: "video", id: VID });
   });
@@ -45,6 +46,7 @@ describe("parseYouTubeUrl — rejects", () => {
     ["https://vimeo.com/12345"],
     ["https://evil.com/watch?v=dQw4w9WgXcQ"],
     ["https://youtube.com.evil.com/watch?v=dQw4w9WgXcQ"],
+    ["https://youtube.com@evil.com/watch?v=dQw4w9WgXcQ"], // userinfo trick
     ["https://www.youtube.com/watch?v=too_short"],
     ["https://www.youtube.com/watch?v=way_too_long_for_an_id"],
     ["https://www.youtube.com/watch"], // no v param
