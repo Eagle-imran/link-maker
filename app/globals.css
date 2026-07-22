@@ -113,3 +113,44 @@ footer { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top
 .bar-col { flex: 1; height: 100%; display: flex; align-items: flex-end; }
 .bar { width: 100%; min-height: 2px; background: var(--accent); border-radius: 2px 2px 0 0; }
 .chart-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.75rem; margin-top: 4px; }
+
+.create-btn {
+  padding: 14px 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.create-btn:disabled { opacity: 0.6; cursor: default; }
+
+.note { margin: 0; color: var(--muted); font-size: 0.85rem; }
+
+.mylinks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.mylinks li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid #333;
+  border-radius: 10px;
+}
+.mylink-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mylink-target { color: var(--fg); font-size: 0.9rem; }
+.mylink-meta code { color: var(--link); font-size: 0.85rem; overflow-wrap: anywhere; }
+.mylink-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.mylink-actions button, .mylink-actions a {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #2a2a2a;
+  color: var(--fg);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+.mylink-actions .remove { background: none; color: var(--muted); font-size: 1.1rem; padding: 4px 6px; }

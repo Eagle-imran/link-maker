@@ -3,10 +3,41 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { parseYouTubeUrl } from "@/lib/youtube";
 
+type SavedLink = {
+  code: string;
+  shortUrl: string;
+  statsUrl: string;
+  target: string;
+  createdAt: string;
+};
+
+const STORAGE_KEY = "linkmaker:links";
+
+function loadSaved(): SavedLink[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistSaved(list: SavedLink[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list.slice(0, 50)));
+  } catch {}
+}
+
 export default function Home() {
   const [input, setInput] = useState("");
   const [sub, setSub] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [track, setTrack] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [created, setCreated] = useState<{ shortUrl: string; statsUrl: string } | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [saved, setSaved] = useState<SavedLink[]>([]);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const target = useMemo(() => parseYouTubeUrl(input), [input]);
@@ -14,27 +45,32 @@ export default function Home() {
 
   const link = useMemo(() => {
     if (!target) return "";
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "";
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
     return target.kind === "video"
       ? `${origin}/v/${target.id}`
       : `${origin}/c/${target.id}${sub ? "?sub=1" : ""}`;
   }, [target, sub]);
 
   useEffect(() => {
-    setCopied(false);
+    setSaved(loadSaved());
+  }, []);
+
+  useEffect(() => {
+    setCopied(null);
+    setCreated(null);
+    setApiError(null);
     clearTimeout(copyTimer.current);
     return () => clearTimeout(copyTimer.current);
-  }, [link]);
+  }, [link, track]);
 
-  async function copy() {
+  async function copy(text: string, tag: string) {
     let ok = true;
     try {
-      await navigator.clipboard.writeText(link);
+      await navigator.clipboard.writeText(text);
     } catch {
       // Restricted contexts (in-app browsers): legacy fallback
       const ta = document.createElement("textarea");
-      ta.value = link;
+      ta.value = text;
       ta.style.position = "fixed";
       ta.style.opacity = "0";
       document.body.appendChild(ta);
@@ -43,9 +79,49 @@ export default function Home() {
       ta.remove();
     }
     if (!ok) return;
-    setCopied(true);
+    setCopied(tag);
     clearTimeout(copyTimer.current);
-    copyTimer.current = setTimeout(() => setCopied(false), 1500);
+    copyTimer.current = setTimeout(() => setCopied(null), 1500);
+  }
+
+  async function createTracked() {
+    setCreating(true);
+    setApiError(null);
+    try {
+      const res = await fetch("/api/links", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ url: input, sub }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setApiError(json.error ?? "Something went wrong — try again.");
+        return;
+      }
+      setCreated(json);
+      const code = json.shortUrl.split("/").pop() as string;
+      const entry: SavedLink = {
+        code,
+        shortUrl: json.shortUrl,
+        statsUrl: json.statsUrl,
+        target:
+          target!.kind === "video" ? `Video ${target!.id}` : target!.id,
+        createdAt: new Date().toISOString(),
+      };
+      const next = [entry, ...saved.filter((l) => l.code !== code)];
+      setSaved(next);
+      persistSaved(next);
+    } catch {
+      setApiError("Network error — try again.");
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  function removeSaved(code: string) {
+    const next = saved.filter((l) => l.code !== code);
+    setSaved(next);
+    persistSaved(next);
   }
 
   return (
@@ -65,9 +141,9 @@ export default function Home() {
           placeholder="https://youtube.com/watch?v=... or youtube.com/@yourchannel"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          autoFocus
           aria-invalid={showError}
           aria-describedby={showError ? "url-error" : undefined}
+          autoFocus
         />
       </label>
 
@@ -95,12 +171,110 @@ export default function Home() {
       )}
 
       {target && (
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={track}
+            onChange={(e) => setTrack(e.target.checked)}
+          />
+          <span>
+            Track clicks
+            <small>
+              Creates a short link with a private stats page — total clicks,
+              daily chart, device split
+            </small>
+          </span>
+        </label>
+      )}
+
+      {target && !track && (
         <div className="result">
           <code>{link}</code>
-          <button type="button" onClick={copy} aria-live="polite">
-            {copied ? "Copied!" : "Copy"}
+          <button type="button" onClick={() => copy(link, "plain")} aria-live="polite">
+            {copied === "plain" ? "Copied!" : "Copy"}
           </button>
         </div>
+      )}
+
+      {target && track && !created && (
+        <button
+          type="button"
+          className="create-btn"
+          onClick={createTracked}
+          disabled={creating}
+        >
+          {creating ? "Creating…" : "Create tracked link"}
+        </button>
+      )}
+
+      {apiError && (
+        <p className="error" role="alert">
+          {apiError}
+        </p>
+      )}
+
+      {created && (
+        <>
+          <div className="result">
+            <code>{created.shortUrl}</code>
+            <button
+              type="button"
+              onClick={() => copy(created.shortUrl, "short")}
+              aria-live="polite"
+            >
+              {copied === "short" ? "Copied!" : "Copy"}
+            </button>
+          </div>
+          <div className="result">
+            <code>{created.statsUrl}</code>
+            <button
+              type="button"
+              onClick={() => copy(created.statsUrl, "stats")}
+              aria-live="polite"
+            >
+              {copied === "stats" ? "Copied!" : "Copy"}
+            </button>
+          </div>
+          <p className="note">
+            Save the stats URL — it&apos;s the only way to see your stats.
+            (It&apos;s also remembered in &ldquo;My links&rdquo; below, in this
+            browser.)
+          </p>
+        </>
+      )}
+
+      {saved.length > 0 && (
+        <section className="info">
+          <h2>My links</h2>
+          <p className="fine">
+            Saved in this browser only — bookmark your stats URL to access it
+            anywhere.
+          </p>
+          <ul className="mylinks">
+            {saved.map((l) => (
+              <li key={l.code}>
+                <div className="mylink-meta">
+                  <span className="mylink-target">{l.target}</span>
+                  <code>{l.shortUrl}</code>
+                </div>
+                <div className="mylink-actions">
+                  <button type="button" onClick={() => copy(l.shortUrl, l.code)}>
+                    {copied === l.code ? "Copied!" : "Copy"}
+                  </button>
+                  <a href={l.statsUrl}>Stats</a>
+                  <button
+                    type="button"
+                    className="remove"
+                    aria-label={`Forget ${l.shortUrl}`}
+                    onClick={() => removeSaved(l.code)}
+                  >
+                    ×
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <section className="info">
@@ -133,7 +307,7 @@ export default function Home() {
       </section>
 
       <footer>
-        Free · no tracking · works on Instagram, TikTok &amp; more
+        Free · no visitor profiling · works on Instagram, TikTok &amp; more
       </footer>
     </main>
   );
