@@ -66,6 +66,15 @@ describe("GET /c/[handle]", () => {
     expect(body).not.toContain("vnd.youtube://");
   });
 
+  it("accepts an already-decoded handle param (production shape)", async () => {
+    const res = await channelGET(new Request("http://localhost/c/@MrBeast"), {
+      params: Promise.resolve({ handle: "@MrBeast" }),
+    });
+    const body = await res.text();
+    expect(body).toContain("vnd.youtube://www.youtube.com/@MrBeast");
+  });
+
+  // Unit-level resilience only: via real HTTP, Next's router 400s malformed percent-encoding before the handler runs
   it("survives malformed percent-encoding", async () => {
     const res = await channelGET(new Request("http://localhost/c/%E0%A4%A"), {
       params: Promise.resolve({ handle: "%E0%A4%A" }),

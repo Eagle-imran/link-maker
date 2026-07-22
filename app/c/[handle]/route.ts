@@ -13,7 +13,7 @@ export async function GET(
 
   let handle: string;
   try {
-    handle = decodeURIComponent(raw); // "@" arrives as "%40"
+    handle = decodeURIComponent(raw); // Next has already decoded the segment once; this second decode recovers double-encoded links (/c/%2540handle) and is a no-op otherwise
   } catch {
     return htmlResponse(renderFallbackPage());
   }
