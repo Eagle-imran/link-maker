@@ -26,8 +26,12 @@ export function getRedis(): RedisLike {
     },
     hincrby: (k, f, n) => client.hincrby(k, f, n),
     hgetall: async (k) => {
-      const h = await client.hgetall<Record<string, string>>(k);
-      return h ?? null;
+      const h = await client.hgetall<Record<string, unknown>>(k);
+      if (!h) return null;
+      // Upstash deserializes numeric-looking fields to numbers; RedisLike promises strings.
+      return Object.fromEntries(
+        Object.entries(h).map(([f, v]) => [f, typeof v === "string" ? v : JSON.stringify(v)])
+      );
     },
     incr: (k) => client.incr(k),
     expire: (k, s) => client.expire(k, s),
