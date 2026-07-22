@@ -1,0 +1,17 @@
+:root {
+  --bg: #0f0f0f;
+  --fg: #ffffff;
+  --muted: #aaaaaa;
+  --accent: #ff0033;
+  --card: #1c1c1c;
+  --link: #3ea6ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
