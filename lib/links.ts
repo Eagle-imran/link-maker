@@ -1,3 +1,5 @@
+import { randomBytes } from "node:crypto";
+
 /** Minimal Redis surface used by Link Maker. Injected everywhere so tests
  * can use tests/fake-redis.ts and production uses lib/redis.ts. */
 export interface RedisLike {
@@ -16,8 +18,7 @@ export const CODE_RE = /^[a-z0-9]{8}$/;
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 
 function randomFromAlphabet(length: number): string {
-  const bytes = new Uint8Array(length);
-  crypto.getRandomValues(bytes);
+  const bytes = randomBytes(length);
   let out = "";
   for (const b of bytes) out += ALPHABET[b % ALPHABET.length];
   return out;
