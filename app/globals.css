@@ -85,3 +85,31 @@ h1 { margin: 0; font-size: 2rem; }
 .fine { font-size: 0.85rem; }
 
 footer { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 12px; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stat {
+  background: var(--card);
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+.stat strong { font-size: 1.5rem; }
+.stat span { color: var(--muted); font-size: 0.8rem; }
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 120px;
+  padding: 8px;
+  background: var(--card);
+  border: 1px solid #333;
+  border-radius: 10px;
+}
+.bar-col { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+.bar { width: 100%; min-height: 2px; background: var(--accent); border-radius: 2px 2px 0 0; }
+.chart-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.75rem; margin-top: 4px; }
