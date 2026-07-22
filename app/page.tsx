@@ -21,7 +21,19 @@ export default function Home() {
   }, [target, sub]);
 
   async function copy() {
-    await navigator.clipboard.writeText(link);
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      // Restricted contexts (in-app browsers): legacy fallback
+      const ta = document.createElement("textarea");
+      ta.value = link;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
