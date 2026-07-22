@@ -12,7 +12,16 @@ export function setRedisForTesting(redis: RedisLike | null): void {
 export function getRedis(): RedisLike {
   if (override) return override;
   if (cached) return cached;
-  const client = Redis.fromEnv(); // UPSTASH_REDIS_REST_URL / _TOKEN
+  // Vercel's Upstash marketplace integration injects KV_* names; direct
+  // Upstash setups use UPSTASH_*. Accept either.
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+  if (!url || !token) {
+    throw new Error("Missing Redis env vars (UPSTASH_REDIS_REST_* or KV_REST_API_*)");
+  }
+  const client = new Redis({ url, token });
   cached = {
     // Upstash auto-deserializes JSON-looking values; normalize back to strings.
     get: async (k) => {
