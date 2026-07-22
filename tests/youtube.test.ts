@@ -102,4 +102,12 @@ describe("deep-link builders", () => {
       )};end`
     );
   });
+
+  it("encodes a fallback URL containing a query string", () => {
+    expect(androidIntentUrl(handleT, true)).toBe(
+      `intent://www.youtube.com/@MrBeast?sub_confirmation=1#Intent;scheme=https;package=com.google.android.youtube;S.browser_fallback_url=${encodeURIComponent(
+        "https://www.youtube.com/@MrBeast?sub_confirmation=1"
+      )};end`
+    );
+  });
 });
