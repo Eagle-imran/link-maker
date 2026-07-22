@@ -28,6 +28,9 @@ That's it. Free, no account, no tracking.
   (`@handle` or channel ID)
 - The "confirm subscribing" option shows YouTube's popup on desktop
   browsers; in the app, viewers land on your channel's Subscribe button
+- Optional **click tracking**: toggle "Track clicks" to get a short link plus
+  a private stats page (total clicks, daily chart, device split). Stats are
+  aggregate counts only — no visitor profiling.
 - If the YouTube app isn't installed, the link falls back to youtube.com
 
 ## For developers
