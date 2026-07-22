@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { POST as createPOST } from "@/app/api/links/route";
+import { GET as shortGET } from "@/app/s/[code]/route";
 import { setRedisForTesting } from "@/lib/redis";
+import { createLink, getStats, todayUTC } from "@/lib/links";
 import { FakeRedis } from "./fake-redis";
 
 let redis: FakeRedis;
@@ -54,5 +56,50 @@ describe("POST /api/links", () => {
     expect(
       (await createReq({ url: "https://youtu.be/dQw4w9WgXcQ" }, "9.9.9.9")).status
     ).toBe(200);
+  });
+});
+
+function shortReq(code: string, ua = "Mozilla/5.0 (Linux; Android 14)") {
+  return shortGET(
+    new Request(`http://localhost/s/${code}`, { headers: { "user-agent": ua } }),
+    { params: Promise.resolve({ code }) }
+  );
+}
+
+describe("GET /s/[code]", () => {
+  it("serves the redirect page and records the click", async () => {
+    const { code } = await createLink(redis, { kind: "video", id: "dQw4w9WgXcQ" }, false);
+    const res = await shortReq(code);
+    const body = await res.text();
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(body).toContain("intent://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    const stats = await getStats(redis, code);
+    expect(stats.total).toBe(1);
+    expect(stats.devices.android).toBe(1);
+    expect(stats.daily[todayUTC()]).toBe(1);
+  });
+
+  it("passes the sub flag through to the redirect URLs", async () => {
+    const { code } = await createLink(redis, { kind: "channel", id: "@MrBeast" }, true);
+    const body = await (await shortReq(code)).text();
+    expect(body).toContain("sub_confirmation=1");
+  });
+
+  it("serves the fallback page for unknown codes without recording", async () => {
+    const res = await shortReq("zzzzzzzz");
+    const body = await res.text();
+    expect(res.status).toBe(200);
+    expect(body).not.toContain("intent://");
+    expect((await getStats(redis, "zzzzzzzz")).total).toBe(0);
+  });
+
+  it("serves the fallback page when redis is down", async () => {
+    redis.get = async () => {
+      throw new Error("boom");
+    };
+    const res = await shortReq("abcd1234");
+    expect(res.status).toBe(200);
+    expect(await res.text()).toContain("https://www.youtube.com");
   });
 });
