@@ -1,34 +1,42 @@
 # Link Maker
 
-Turn any YouTube link into a smart link that opens the **native YouTube app**
-instead of a social app's in-app browser (Instagram, TikTok, …). Viewers stay
-logged in, so they can subscribe, like, and comment.
+**Get more subscribers from Instagram, TikTok, and other social apps.**
 
-## How it works
+## The problem
 
-- `/v/{videoId}` and `/c/{@handle|channelId}` serve a ~1 KB HTML page with one
-  inline script — no framework JS on the redirect hot path.
-- **Android:** `intent://` URL targeting the YouTube package, with a built-in
-  browser fallback.
-- **iOS:** `vnd.youtube://` scheme with a 1.5 s timer fallback to the web URL,
-  cancelled if the app takes over.
-- **Desktop:** immediate redirect to youtube.com.
-- `?sub=1` on channel links adds YouTube's subscribe-confirmation prompt
-  (`sub_confirmation=1`). Note: the prompt is a **web-only** YouTube feature —
-  desktop browsers show it, but the native apps ignore the parameter and open
-  the channel page directly.
+When someone taps your YouTube link inside Instagram, TikTok, or any social
+app, it opens in the app's built-in browser — where they're **not logged in
+to YouTube**. They can't subscribe, like, or comment. Most just leave.
 
-No accounts, no tracking, no database.
+## The fix
 
-## Develop
+Link Maker gives you a smart link that skips the in-app browser and opens
+your video or channel **in the YouTube app**, where viewers are already
+logged in. One tap to subscribe.
 
-    npm install
-    npm run dev    # http://localhost:3000
-    npm test       # Vitest unit tests
-    npm run build  # production build
+## How to use it
 
-## Deploy
+1. Go to **https://link-maker-mu.vercel.app**
+2. Paste any YouTube link (video, Short, or channel)
+3. Copy the smart link and use it in your bio, stories, and captions
 
-Push to a Git repo and import into [Vercel](https://vercel.com) — zero config.
-After deploying, test links from the Instagram in-app browser on iOS and
-Android (paste a smart link into your own story/bio).
+That's it. Free, no account, no tracking.
+
+**Good to know**
+
+- Works with videos (`watch`, `youtu.be`, Shorts, live) and channels
+  (`@handle` or channel ID)
+- The "confirm subscribing" option shows YouTube's popup on desktop
+  browsers; in the app, viewers land on your channel's Subscribe button
+- If the YouTube app isn't installed, the link falls back to youtube.com
+
+## For developers
+
+```
+npm install
+npm run dev    # http://localhost:3000
+npm test       # unit tests
+npm run build  # production build (stop the dev server first)
+```
+
+Deploy: push to GitHub, import into [Vercel](https://vercel.com). Done.

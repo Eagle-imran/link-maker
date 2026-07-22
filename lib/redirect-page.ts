@@ -44,11 +44,24 @@ export function renderRedirectPage(target: Target, sub = false): string {
     `location.href=${JSON.stringify(ios)};}` +
     `else{location.replace(web);}})();`;
 
+  // Open Graph tags so links pasted in WhatsApp/iMessage/Discord get a real
+  // preview. Video thumbnails are predictable — no API needed.
+  const ogTitle = target.kind === "video" ? "Watch on YouTube" : "Open channel on YouTube";
+  const og =
+    `<meta property="og:title" content="${ogTitle}">` +
+    `<meta property="og:description" content="Opens in the YouTube app — subscribe, like, and comment.">` +
+    `<meta property="og:url" content="${web}">` +
+    (target.kind === "video"
+      ? `<meta property="og:image" content="https://i.ytimg.com/vi/${id}/hqdefault.jpg">` +
+        `<meta name="twitter:card" content="summary_large_image">`
+      : "");
+
   return (
     `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
     `<meta name="viewport" content="width=device-width,initial-scale=1">` +
     `<meta name="robots" content="noindex">` +
     `<title>Opening YouTube…</title>` +
+    og +
     `<style>${PAGE_STYLE}</style>` +
     `</head><body><p>Opening YouTube…</p>` +
     `<a href="${web}">Tap here if nothing happens</a>` +

@@ -24,7 +24,27 @@ describe("renderRedirectPage", () => {
   });
 
   it("is small", () => {
-    expect(html.length).toBeLessThan(2048);
+    expect(html.length).toBeLessThan(2560);
+  });
+
+  it("has Open Graph tags with the video thumbnail", () => {
+    expect(html).toContain('property="og:title" content="Watch on YouTube"');
+    expect(html).toContain(
+      'property="og:image" content="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"'
+    );
+    expect(html).toContain(
+      'property="og:url" content="https://www.youtube.com/watch?v=dQw4w9WgXcQ"'
+    );
+    expect(html).toContain('name="twitter:card" content="summary_large_image"');
+  });
+
+  it("has Open Graph tags without an image for channels", () => {
+    const chanHtml = renderRedirectPage({ kind: "channel", id: "@MrBeast" });
+    expect(chanHtml).toContain(
+      'property="og:title" content="Open channel on YouTube"'
+    );
+    expect(chanHtml).not.toContain("og:image");
+    expect(chanHtml).not.toContain("twitter:card");
   });
 
   it("passes sub through to the URLs", () => {
