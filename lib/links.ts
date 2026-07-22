@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import type { Target } from "./youtube";
 
 /** Minimal Redis surface used by Link Maker. Injected everywhere so tests
  * can use tests/fake-redis.ts and production uses lib/redis.ts. */
@@ -55,4 +56,97 @@ export function buildDailySeries(
     out.push({ date, count: daily[date] ?? 0 });
   }
   return out;
+}
+
+export type StoredLink = {
+  kind: Target["kind"];
+  id: string;
+  sub: boolean;
+  statsKey: string;
+  createdAt: string;
+};
+
+export async function createLink(
+  redis: RedisLike,
+  target: Target,
+  sub: boolean
+): Promise<{ code: string; statsKey: string }> {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = randomCode();
+    const statsKey = randomStatsKey();
+    const stored: StoredLink = {
+      kind: target.kind,
+      id: target.id,
+      sub,
+      statsKey,
+      createdAt: new Date().toISOString(),
+    };
+    const ok = await redis.set(`link:${code}`, JSON.stringify(stored), { nx: true });
+    if (ok) return { code, statsKey };
+  }
+  throw new Error("could not allocate a short code");
+}
+
+export async function getLink(
+  redis: RedisLike,
+  code: string
+): Promise<StoredLink | null> {
+  if (!CODE_RE.test(code)) return null;
+  const raw = await redis.get(`link:${code}`);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as StoredLink;
+  } catch {
+    return null;
+  }
+}
+
+export async function recordClick(
+  redis: RedisLike,
+  code: string,
+  device: Device
+): Promise<void> {
+  const key = `clicks:${code}`;
+  await Promise.all([
+    redis.hincrby(key, "total", 1),
+    redis.hincrby(key, `d:${todayUTC()}`, 1),
+    redis.hincrby(key, `dev:${device}`, 1),
+  ]);
+}
+
+export type LinkStats = {
+  total: number;
+  daily: Record<string, number>;
+  devices: Record<Device, number>;
+};
+
+export async function getStats(redis: RedisLike, code: string): Promise<LinkStats> {
+  const h = (await redis.hgetall(`clicks:${code}`)) ?? {};
+  const stats: LinkStats = {
+    total: 0,
+    daily: {},
+    devices: { android: 0, ios: 0, desktop: 0 },
+  };
+  for (const [field, value] of Object.entries(h)) {
+    const n = Number(value) || 0;
+    if (field === "total") stats.total = n;
+    else if (field.startsWith("d:")) stats.daily[field.slice(2)] = n;
+    else if (field.startsWith("dev:")) {
+      const dev = field.slice(4) as Device;
+      if (dev in stats.devices) stats.devices[dev] = n;
+    }
+  }
+  return stats;
+}
+
+export async function checkRateLimit(
+  redis: RedisLike,
+  ip: string,
+  limit = 20,
+  windowSeconds = 3600
+): Promise<boolean> {
+  const key = `ratelimit:${ip}`;
+  const n = await redis.incr(key);
+  if (n === 1) await redis.expire(key, windowSeconds);
+  return n <= limit;
 }
