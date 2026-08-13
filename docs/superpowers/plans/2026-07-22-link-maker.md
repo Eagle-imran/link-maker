@@ -1,5 +1,8 @@
 # Link Maker Implementation Plan
 
+> **Historical record:** This plan has been implemented and is not current
+> operating documentation. See the [documentation index](../../README.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A public web tool that turns YouTube URLs into smart links that escape social-app in-app browsers and open the native YouTube app.

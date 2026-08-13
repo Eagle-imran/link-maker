@@ -1,7 +1,11 @@
 # Link Maker — Design Spec
 
+> **Historical record:** This specification describes the initial stateless
+> release and is superseded by the canonical [architecture documentation](../../architecture/overview.md).
+> In particular, optional tracked links and Redis persistence now exist.
+
 **Date:** 2026-07-22
-**Status:** Approved
+**Status:** Superseded
 
 ## Purpose
 

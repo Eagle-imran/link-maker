@@ -1,7 +1,12 @@
 # Tracked Short Links (`/s/`) — Design Spec
 
+> **Historical record:** This approved implementation design is retained for
+> context. The canonical current behavior is documented in the
+> [architecture overview](../../architecture/overview.md), [API reference](../../reference/api.md),
+> and [privacy and security guide](../../privacy-and-security.md).
+
 **Date:** 2026-07-22
-**Status:** Approved
+**Status:** Implemented; historical
 **Builds on:** `2026-07-22-link-maker-design.md`
 
 ## Purpose

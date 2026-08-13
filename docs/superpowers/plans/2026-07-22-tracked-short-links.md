@@ -1,5 +1,8 @@
 # Tracked Short Links Implementation Plan
 
+> **Historical record:** This plan has been implemented and is not current
+> operating documentation. See the [documentation index](../../README.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Opt-in `/s/{code}` short links with click analytics (total, 30-day daily, device split), secret stats URLs, and a localStorage "My links" list.
