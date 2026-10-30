@@ -15,7 +15,7 @@ Release steps:
 1. Open a pull request. CI must pass (`docs:check`, `test`, `build`).
 2. Check the preview: the homepage loads, a video and a channel link redirect
    correctly, and a bad link shows the fallback page.
-3. Merge to `main`, then repeat a quick check on <https://link-maker-mu.vercel.app>.
+3. Merge to `main`, then repeat a quick check on <https://ytopen.vercel.app>.
 4. Add user-visible changes to `CHANGELOG.md`.
 
 To roll back, promote the previous deployment in Vercel. Rolling back doesn't

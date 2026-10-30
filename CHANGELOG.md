@@ -16,6 +16,10 @@ The format follows the principles of Keep a Changelog.
 
 ### Changed
 
+- Renamed the site to ytopen (now at ytopen.vercel.app) with a new logo: a
+  play arrow leaving a frame.
+- Channel links made from an `@handle` are shorter: `/@handle` instead of
+  `/c/@handle`. Existing `/c/` links still work.
 - Redesigned the site in black and graphite with the Instrument Sans typeface,
   and rewrote the page copy. The finished link is now shown large, and saved
   links are listed under Your links.

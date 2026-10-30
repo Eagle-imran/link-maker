@@ -1,11 +1,28 @@
 export function Brand() {
   return (
-    <a className="brand" href="/" aria-label="Link Maker home">
+    <a className="brand" href="/" aria-label="ytopen home">
+      {/* A play arrow leaving a frame: the link breaks out of the in-app browser. */}
       <svg viewBox="0 0 64 64" width="22" height="22" aria-hidden="true">
         <rect width="64" height="64" rx="16" fill="#f4f4f1" />
-        <path d="M27 21l16 11-16 11z" fill="#000" />
+        <path
+          d="M18 28v18h18"
+          fill="none"
+          stroke="#000"
+          strokeWidth="5.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M46 18 40.4 36.4 27.6 23.6z"
+          fill="#000"
+          stroke="#000"
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
       </svg>
-      Link Maker
+      <span>
+        <span className="brand-yt">yt</span>open
+      </span>
     </a>
   );
 }

@@ -36,9 +36,13 @@ thumbnail. Invalid links get a fallback page that links to youtube.com, with
 HTTP `200`.
 
 Destinations are always built from a validated ID dropped into a fixed YouTube
-URL, so Link Maker can't be used to redirect anywhere else.
+URL, so ytopen can't be used to redirect anywhere else.
 
 ## Direct links: `/v/` and `/c/`
+
+Channel handles get the shorter `/@handle`, which `next.config.ts` rewrites to
+`/c/@handle`. Channel IDs (`UC…`) keep the `/c/` prefix, and older `/c/@handle`
+links keep working.
 
 Nothing is stored and nothing is counted. Because the page for a given ID never
 changes, it's cached for a year on Vercel's edge and an hour in browsers. A new

@@ -12,7 +12,7 @@ This describes what the app does. It isn't a legal privacy policy.
 | Link creator's IP, as a rate-limit counter | Redis `ratelimit:{ip}` | One hour |
 | **Your links** list | The creator's browser (`localStorage`) | Until removed or site data is cleared |
 
-For clicks, Link Maker stores only counts. It doesn't store IPs, User-Agents,
+For clicks, ytopen stores only counts. It doesn't store IPs, User-Agents,
 referrers, cookies, locations or individual click records, and counts aren't
 deduplicated. Device type is worked out from the User-Agent and then discarded.
 

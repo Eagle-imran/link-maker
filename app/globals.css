@@ -50,6 +50,7 @@ a { color: inherit; }
   text-decoration: none;
   border-radius: 6px;
 }
+.brand-yt { color: var(--smoke); }
 
 /* Hero */
 
@@ -228,7 +229,7 @@ a { color: inherit; }
   .block { grid-template-columns: 180px 1fr; gap: 32px; }
 }
 
-/* Regular link vs Link Maker link */
+/* Regular link vs ytopen link */
 
 .compare {
   display: grid;

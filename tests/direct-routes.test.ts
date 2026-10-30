@@ -82,3 +82,27 @@ describe("GET /c/[handle]", () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe("/@handle rewrite", () => {
+  // Turns the Next.js "/:handle(<regex>)" source into a plain RegExp.
+  async function rewriteMatches(path: string) {
+    const { default: config } = await import("@/next.config");
+    const rules = await config.rewrites!();
+    const [rule] = Array.isArray(rules) ? rules : rules.afterFiles ?? [];
+    expect(rule.destination).toBe("/c/:handle");
+    const group = rule.source.match(/^\/:handle\((.+)\)$/)![1];
+    return new RegExp(`^/(${group})$`).test(path);
+  }
+
+  it("matches valid handles", async () => {
+    expect(await rewriteMatches("/@MrBeast")).toBe(true);
+    expect(await rewriteMatches("/@owais.the_realtor-1")).toBe(true);
+  });
+
+  it("leaves other routes alone", async () => {
+    expect(await rewriteMatches("/s/a1b2c3d4")).toBe(false);
+    expect(await rewriteMatches("/v/dQw4w9WgXcQ")).toBe(false);
+    expect(await rewriteMatches("/@ab")).toBe(false);
+    expect(await rewriteMatches("/api/links")).toBe(false);
+  });
+});

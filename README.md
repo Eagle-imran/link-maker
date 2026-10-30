@@ -1,10 +1,10 @@
-# Link Maker
+# ytopen
 
 Instagram and TikTok open links in their own browser, where viewers aren't
-signed in to YouTube, so they can't subscribe, like or comment. Link Maker turns
+signed in to YouTube, so they can't subscribe, like or comment. ytopen turns
 a YouTube link into one that opens the YouTube app instead.
 
-**Live:** <https://link-maker-mu.vercel.app>
+**Live:** <https://ytopen.vercel.app>
 
 ## Using it
 
@@ -26,7 +26,7 @@ your links under **Your links**, in that browser only.
 | You paste | You get |
 | --- | --- |
 | `youtube.com/watch?v=…`, `youtu.be/…`, `/shorts/…`, `/live/…` | `/v/{videoId}` |
-| `youtube.com/@handle` | `/c/@handle` |
+| `youtube.com/@handle` | `/@handle` |
 | `youtube.com/channel/UC…` | `/c/{channelId}` |
 | Any of the above, with click tracking | `/s/{code}` |
 
