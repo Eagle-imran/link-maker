@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { parseYouTubeUrl } from "@/lib/youtube";
+import { Brand } from "./brand";
 
 type SavedLink = {
   code: string;
@@ -87,15 +88,22 @@ export default function Home() {
   async function createTracked() {
     setCreating(true);
     setApiError(null);
+    let res: Response;
     try {
-      const res = await fetch("/api/links", {
+      res = await fetch("/api/links", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ url: input, sub }),
       });
-      const json = await res.json();
-      if (!res.ok) {
-        setApiError(json.error ?? "Something went wrong — try again.");
+    } catch {
+      setApiError("Couldn't reach Link Maker. Check your connection and try again.");
+      setCreating(false);
+      return;
+    }
+    try {
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.code) {
+        setApiError(json.error ?? "Couldn't create the link. Try again in a minute.");
         return;
       }
       setCreated(json);
@@ -111,8 +119,6 @@ export default function Home() {
       const next = [entry, ...saved.filter((l) => l.code !== code)];
       setSaved(next);
       persistSaved(next);
-    } catch {
-      setApiError("Network error — try again.");
     } finally {
       setCreating(false);
     }
@@ -126,189 +132,222 @@ export default function Home() {
 
   return (
     <main className="wrap">
-      <h1>Link Maker</h1>
-      <p className="tagline">
-        Turn any YouTube link into one that opens the <strong>YouTube app</strong>{" "}
-        — not the in-app browser. Viewers stay logged in, so they can actually
-        subscribe, like, and comment.
-      </p>
+      <Brand />
 
-      <label className="field">
-        <span>Paste a YouTube link</span>
-        <input
-          type="url"
-          inputMode="url"
-          placeholder="https://youtube.com/watch?v=... or youtube.com/@yourchannel"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          aria-invalid={showError}
-          aria-describedby={showError ? "url-error" : undefined}
-          autoFocus
-        />
-      </label>
-
-      {showError && (
-        <p className="error" id="url-error" role="alert">
-          That doesn&apos;t look like a YouTube link.
+      <section className="hero">
+        <h1>YouTube links that open in the app.</h1>
+        <p className="lede">
+          Instagram and TikTok open links in their own browser, where viewers
+          aren&apos;t signed in to YouTube. A Link Maker link opens the YouTube
+          app instead, so subscribing, liking and commenting take one tap.
         </p>
-      )}
+      </section>
 
-      {target?.kind === "channel" && (
-        <label className="toggle">
+      <section className="maker" aria-label="Make a link">
+        <label className="field">
+          <span>YouTube link</span>
           <input
-            type="checkbox"
-            checked={sub}
-            onChange={(e) => setSub(e.target.checked)}
+            type="url"
+            inputMode="url"
+            placeholder="Paste a video or channel link"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            aria-invalid={showError}
+            aria-describedby={showError ? "url-error" : undefined}
+            autoFocus
           />
-          <span>
-            Ask visitors to confirm subscribing
-            <small>
-              Desktop browsers only — in the YouTube app, viewers land on your
-              channel with the Subscribe button
-            </small>
-          </span>
         </label>
-      )}
 
-      {target && (
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={track}
-            onChange={(e) => setTrack(e.target.checked)}
-          />
-          <span>
-            Track clicks
-            <small>
-              Creates a short link with a private stats page — total clicks,
-              daily chart, device split
-            </small>
-          </span>
-        </label>
-      )}
-
-      {target && !track && (
-        <div className="result">
-          <code>{link}</code>
-          <button type="button" onClick={() => copy(link, "plain")} aria-live="polite">
-            {copied === "plain" ? "Copied!" : "Copy"}
-          </button>
-        </div>
-      )}
-
-      {target && track && !created && (
-        <button
-          type="button"
-          className="create-btn"
-          onClick={createTracked}
-          disabled={creating}
-        >
-          {creating ? "Creating…" : "Create tracked link"}
-        </button>
-      )}
-
-      {apiError && (
-        <p className="error" role="alert">
-          {apiError}
-        </p>
-      )}
-
-      {created && (
-        <>
-          <div className="result">
-            <code>{created.shortUrl}</code>
-            <button
-              type="button"
-              onClick={() => copy(created.shortUrl, "short")}
-              aria-live="polite"
-            >
-              {copied === "short" ? "Copied!" : "Copy"}
-            </button>
-          </div>
-          <div className="result">
-            <code>{created.statsUrl}</code>
-            <button
-              type="button"
-              onClick={() => copy(created.statsUrl, "stats")}
-              aria-live="polite"
-            >
-              {copied === "stats" ? "Copied!" : "Copy"}
-            </button>
-          </div>
-          <p className="note">
-            Save the stats URL — it&apos;s the only way to see your stats.
-            (It&apos;s also remembered in &ldquo;My links&rdquo; below, in this
-            browser.)
+        {showError && (
+          <p className="error" id="url-error" role="alert">
+            This isn&apos;t a YouTube video or channel link. Playlists aren&apos;t
+            supported.
           </p>
-        </>
-      )}
+        )}
+
+        {target && (
+          <div className="options">
+            {target.kind === "channel" && (
+              <label className="toggle">
+                <span>
+                  Ask viewers to subscribe
+                  <small>
+                    Shows YouTube&apos;s subscribe prompt in desktop browsers. In
+                    the app, viewers land on your channel.
+                  </small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={sub}
+                  onChange={(e) => setSub(e.target.checked)}
+                />
+              </label>
+            )}
+            <label className="toggle">
+              <span>
+                Track clicks
+                <small>
+                  Makes a short link with a private stats page: total clicks, a
+                  30-day chart and the split by device.
+                </small>
+              </span>
+              <input
+                type="checkbox"
+                checked={track}
+                onChange={(e) => setTrack(e.target.checked)}
+              />
+            </label>
+          </div>
+        )}
+
+        {target && !track && (
+          <div className="result">
+            <span className="result-label">Your link</span>
+            <div className="result-row">
+              <span className="result-url">{bare(link)}</span>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => copy(link, "plain")}
+                aria-live="polite"
+              >
+                {copied === "plain" ? "Copied" : "Copy"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {target && track && !created && (
+          <button
+            type="button"
+            className="btn wide"
+            onClick={createTracked}
+            disabled={creating}
+          >
+            {creating ? "Creating link…" : "Create tracked link"}
+          </button>
+        )}
+
+        {apiError && (
+          <p className="error" role="alert">
+            {apiError}
+          </p>
+        )}
+
+        {created && (
+          <>
+            <div className="result">
+              <span className="result-label">Your link</span>
+              <div className="result-row">
+                <span className="result-url">{bare(created.shortUrl)}</span>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => copy(created.shortUrl, "short")}
+                  aria-live="polite"
+                >
+                  {copied === "short" ? "Copied" : "Copy"}
+                </button>
+              </div>
+            </div>
+            <div className="result">
+              <span className="result-label">Stats page, private</span>
+              <div className="result-row">
+                <span className="result-url small">{bare(created.statsUrl)}</span>
+                <button
+                  type="button"
+                  className="btn quiet"
+                  onClick={() => copy(created.statsUrl, "stats")}
+                  aria-live="polite"
+                >
+                  {copied === "stats" ? "Copied" : "Copy"}
+                </button>
+              </div>
+            </div>
+            <p className="note">
+              Keep the stats page link somewhere safe. It&apos;s the only way to
+              see your clicks, and anyone with it can see them too. This browser
+              also remembers it under Your links.
+            </p>
+          </>
+        )}
+      </section>
 
       {saved.length > 0 && (
-        <section className="info">
-          <h2>My links</h2>
-          <p className="fine">
-            Saved in this browser only — bookmark your stats URL to access it
-            anywhere.
-          </p>
-          <ul className="mylinks">
-            {saved.map((l) => (
-              <li key={l.code}>
-                <div className="mylink-meta">
-                  <span className="mylink-target">{l.target}</span>
-                  <code>{l.shortUrl}</code>
-                </div>
-                <div className="mylink-actions">
-                  <button type="button" onClick={() => copy(l.shortUrl, l.code)}>
-                    {copied === l.code ? "Copied!" : "Copy"}
-                  </button>
-                  <a href={l.statsUrl}>Stats</a>
-                  <button
-                    type="button"
-                    className="remove"
-                    aria-label={`Forget ${l.shortUrl}`}
-                    onClick={() => removeSaved(l.code)}
-                  >
-                    ×
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+        <section className="block">
+          <h2>Your links</h2>
+          <div>
+            <ul className="mylinks">
+              {saved.map((l) => (
+                <li key={l.code}>
+                  <div className="mylink-meta">
+                    <span className="mylink-target">{l.target}</span>
+                    <span className="mylink-url">{path(l.shortUrl)}</span>
+                  </div>
+                  <div className="mylink-actions">
+                    <button
+                      type="button"
+                      className="btn quiet"
+                      onClick={() => copy(l.shortUrl, l.code)}
+                    >
+                      {copied === l.code ? "Copied" : "Copy"}
+                    </button>
+                    <a className="btn quiet" href={l.statsUrl}>
+                      Stats
+                    </a>
+                    <button
+                      type="button"
+                      className="remove"
+                      aria-label={`Remove ${l.shortUrl} from this list`}
+                      onClick={() => removeSaved(l.code)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="fine">
+              Saved in this browser only. Removing a link here doesn&apos;t stop
+              it working.
+            </p>
+          </div>
         </section>
       )}
 
-      <section className="info">
-        <h2>Why smart links?</h2>
-        <p>
-          When someone taps your YouTube link inside Instagram or TikTok, it
-          opens in the app&apos;s built-in browser — where they&apos;re{" "}
-          <strong>not logged in to YouTube</strong>. They can&apos;t subscribe,
-          like, or comment. Most just leave.
-        </p>
-        <p>
-          A smart link skips the in-app browser and opens your video or channel
-          in the <strong>YouTube app</strong>, where viewers are already logged
-          in. One tap to subscribe — more subscribers and watch time from the
-          exact same clicks.
-        </p>
-      </section>
-
-      <section className="info">
+      <section className="block">
         <h2>How it works</h2>
-        <ol>
-          <li>Paste any YouTube link — video, Short, or channel</li>
-          <li>Copy your smart link</li>
-          <li>Use it in your bio, stories, and captions</li>
-        </ol>
-        <p className="fine">
-          If the YouTube app isn&apos;t installed, the link falls back to
-          youtube.com — nobody hits a dead end.
-        </p>
+        <div>
+          <ol className="steps">
+            <li>Paste a link to a video, Short or channel.</li>
+            <li>Copy your new link.</li>
+            <li>Put it in your bio, stories and captions.</li>
+          </ol>
+          <p className="fine">
+            Without the YouTube app, the link opens youtube.com instead, so it
+            always goes somewhere.
+          </p>
+        </div>
       </section>
 
       <footer>
-        Free · no visitor profiling · works on Instagram, TikTok &amp; more
+        Free to use. Links don&apos;t track viewers unless you turn on click
+        tracking, and even then only totals are kept.
       </footer>
     </main>
   );
+}
+
+/** Drops the protocol so links read cleanly; the copied value keeps it. */
+function bare(url: string): string {
+  return url.replace(/^https?:\/\//, "");
+}
+
+/** The site is the same for every saved link, so the list shows only the path. */
+function path(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return bare(url);
+  }
 }

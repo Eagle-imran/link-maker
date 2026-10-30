@@ -21,7 +21,7 @@ The short URL can be shared publicly. Anyone possessing the complete stats URL,
 including its `key` query parameter, can view that link's statistics. Treat the
 stats URL like a password and do not publish it.
 
-The **My links** list is stored in the current browser's `localStorage`. It is a
+The **Your links** list is stored in the current browser's `localStorage`. It is a
 convenience list, not a server-side account or backup. Clearing site data,
 changing browsers, or changing devices removes access to that list. Bookmark or
 otherwise securely save important stats URLs.
@@ -34,7 +34,8 @@ otherwise securely save important stats URLs.
 
 Counts are best-effort rather than billing-grade analytics. Deferred writes can
 fail, automated clients may be counted, and device classification is based on
-the request's User-Agent header.
+the request's User-Agent header. iPads that request the desktop-class site
+(the iPadOS Safari default) are counted as desktop.
 
 ## Subscribe confirmation
 

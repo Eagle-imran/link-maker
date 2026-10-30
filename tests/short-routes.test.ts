@@ -58,6 +58,27 @@ describe("POST /api/links", () => {
       (await createReq({ url: "https://youtu.be/dQw4w9WgXcQ" }, "9.9.9.9")).status
     ).toBe(200);
   });
+
+  it("returns a JSON 503 when Redis isn't configured", async () => {
+    setRedisForTesting(null);
+    const names = [
+      "UPSTASH_REDIS_REST_URL",
+      "UPSTASH_REDIS_REST_TOKEN",
+      "KV_REST_API_URL",
+      "KV_REST_API_TOKEN",
+    ];
+    const saved = names.map((n) => process.env[n]);
+    names.forEach((n) => delete process.env[n]);
+    try {
+      const res = await createReq({ url: "https://youtu.be/dQw4w9WgXcQ" });
+      expect(res.status).toBe(503);
+      expect((await res.json()).error).toContain("Tracking is unavailable");
+    } finally {
+      names.forEach((n, i) => {
+        if (saved[i] !== undefined) process.env[n] = saved[i];
+      });
+    }
+  });
 });
 
 function shortReq(code: string, ua = "Mozilla/5.0 (Linux; Android 14)") {
@@ -138,24 +159,24 @@ describe("StatsPage key gate", () => {
     );
     await recordClick(redis, code, "ios");
     const text = textOf(await renderStats(code, statsKey));
-    expect(text).toContain("Link stats");
-    expect(text).toContain("total clicks");
-    expect(text).toContain("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    expect(text).toContain("Clicks");
+    expect(text).toContain("in total");
+    expect(text).toContain("www.youtube.com/watch?v=dQw4w9WgXcQ");
   });
 
   it("renders NotFound for a wrong key", async () => {
     const { code } = await createLink(redis, { kind: "video", id: "dQw4w9WgXcQ" }, false);
     const text = textOf(await renderStats(code, "0000000000000000"));
-    expect(text).toContain("Stats not found");
-    expect(text).not.toContain("total clicks");
+    expect(text).toContain("No stats found");
+    expect(text).not.toContain("in total");
   });
 
   it("renders NotFound for a missing key and unknown code", async () => {
     expect(textOf(await renderStats("zzzzzzzz", "0000000000000000"))).toContain(
-      "Stats not found"
+      "No stats found"
     );
     const { code } = await createLink(redis, { kind: "video", id: "dQw4w9WgXcQ" }, false);
-    expect(textOf(await renderStats(code))).toContain("Stats not found");
+    expect(textOf(await renderStats(code))).toContain("No stats found");
   });
 
   it("renders NotFound for a corrupted stored record", async () => {
@@ -164,7 +185,7 @@ describe("StatsPage key gate", () => {
       JSON.stringify({ kind: "video", id: 12345, sub: false, statsKey: "k".repeat(16), createdAt: "x" })
     );
     const text = textOf(await renderStats("corrupt1", "k".repeat(16)));
-    expect(text).toContain("Stats not found");
+    expect(text).toContain("No stats found");
   });
 
   it("labels stats unavailable when redis fails mid-page", async () => {
@@ -173,6 +194,6 @@ describe("StatsPage key gate", () => {
       throw new Error("boom");
     };
     const text = textOf(await renderStats(code, statsKey));
-    expect(text).toContain("temporarily unavailable");
+    expect(text).toContain("Stats are unavailable");
   });
 });

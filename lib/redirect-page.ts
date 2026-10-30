@@ -9,7 +9,7 @@ import {
 } from "./youtube";
 
 const PAGE_STYLE =
-  "body{font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;gap:12px;background:#0f0f0f;color:#fff}a{color:#3ea6ff}";
+  "body{font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;gap:12px;background:#000 radial-gradient(120% 60% at 50% -10%,#1d1d22,#000 70%);color:#f4f4f1}a{color:#c4c4ca}";
 
 /**
  * Hand-written minimal HTML — deliberately not a React page so the
@@ -34,7 +34,8 @@ export function renderRedirectPage(target: Target, sub = false): string {
   const script =
     `(function(){var ua=navigator.userAgent,web=${JSON.stringify(web)};` +
     `if(/Android/i.test(ua)){location.href=${JSON.stringify(intent)};}` +
-    `else if(/iPhone|iPad|iPod/.test(ua)){` +
+    // iPadOS 13+ Safari sends a Mac UA by default; real Macs report 0 touch points.
+    `else if(/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)){` +
     `var t=setTimeout(function(){location.href=web;},1500);` +
     `var c=function(){clearTimeout(t);};` +
     `document.addEventListener("visibilitychange",function(){if(document.hidden)c();});` +
@@ -76,7 +77,7 @@ export function renderFallbackPage(): string {
     `<meta name="robots" content="noindex">` +
     `<title>Link Maker</title>` +
     `<style>${PAGE_STYLE}</style>` +
-    `</head><body><p>That link doesn&#39;t look right.</p>` +
+    `</head><body><p>This link isn&#39;t valid.</p>` +
     `<a href="https://www.youtube.com">Go to YouTube</a></body></html>`
   );
 }

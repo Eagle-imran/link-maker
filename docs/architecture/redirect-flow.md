@@ -20,7 +20,9 @@ alone.
 1. `/s/{code}` validates the eight-character code and loads `link:{code}`.
 2. Missing, malformed, or unavailable records produce the safe fallback page.
 3. For a valid record, the request User-Agent is classified as Android, iOS, or
-   desktop/unknown.
+   desktop/unknown. An iPad sending a desktop-class (Mac) User-Agent is
+   indistinguishable from a Mac on the server and is counted as desktop, even
+   though the client handoff below still opens the app.
 4. Click counting is scheduled with Next.js `after()`. In test contexts without
    a request scope it runs inline.
 5. The same redirect HTML is returned with `Cache-Control: no-store`, ensuring
@@ -39,7 +41,9 @@ for systems where the app cannot be opened.
 
 ### iOS and iPadOS
 
-The script assigns a `vnd.youtube://` URL and starts an approximately 1.5-second
+The script detects iPhone, iPad, and iPod User-Agents, plus iPads that send a
+desktop-class `Macintosh` User-Agent and report more than one touch point
+(`navigator.maxTouchPoints > 1`). It assigns a `vnd.youtube://` URL and starts an approximately 1.5-second
 HTTPS fallback timer. `visibilitychange` and `pagehide` cancel the timer when
 the page is backgrounded during successful app handoff. The manual link remains
 available if automatic navigation is blocked.

@@ -60,6 +60,56 @@ describe("renderRedirectPage", () => {
   });
 });
 
+/** Runs the page's inline script against a fake browser and reports where it navigated. */
+function runHandoff(html: string, ua: string, maxTouchPoints = 0) {
+  const script = html.match(/<script>([\s\S]*)<\/script>/)![1];
+  const nav: { href?: string; replaced?: string; timer: boolean } = { timer: false };
+  const location = {
+    set href(v: string) { nav.href = v; },
+    replace(v: string) { nav.replaced = v; },
+  };
+  new Function("navigator", "location", "document", "window", "setTimeout", "clearTimeout", script)(
+    { userAgent: ua, maxTouchPoints },
+    location,
+    { addEventListener() {}, hidden: false },
+    { addEventListener() {} },
+    () => { nav.timer = true; return 0; },
+    () => {}
+  );
+  return nav;
+}
+
+describe("client handoff", () => {
+  const html = renderRedirectPage(videoT);
+  const IOS = "vnd.youtube://www.youtube.com/watch?v=dQw4w9WgXcQ";
+  const WEB = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+  const MAC_UA =
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15";
+
+  it("sends Android to the intent URL", () => {
+    const nav = runHandoff(html, "Mozilla/5.0 (Linux; Android 14; Pixel 8)");
+    expect(nav.href).toMatch(/^intent:\/\//);
+  });
+
+  it("sends iPhone to the app with a timed fallback", () => {
+    const nav = runHandoff(html, "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)", 5);
+    expect(nav.href).toBe(IOS);
+    expect(nav.timer).toBe(true);
+  });
+
+  it("sends an iPad with a desktop-class UA to the app", () => {
+    const nav = runHandoff(html, MAC_UA, 5);
+    expect(nav.href).toBe(IOS);
+    expect(nav.timer).toBe(true);
+  });
+
+  it("keeps a real Mac on the web", () => {
+    const nav = runHandoff(html, MAC_UA, 0);
+    expect(nav.replaced).toBe(WEB);
+    expect(nav.href).toBeUndefined();
+  });
+});
+
 describe("renderFallbackPage", () => {
   it("links to youtube.com", () => {
     expect(renderFallbackPage()).toContain("https://www.youtube.com");

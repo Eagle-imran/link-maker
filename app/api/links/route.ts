@@ -32,8 +32,9 @@ export async function POST(req: Request) {
     );
   }
 
-  const redis = getRedis();
   try {
+    // Inside the try: getRedis() throws when Redis isn't configured.
+    const redis = getRedis();
     if (!(await checkRateLimit(redis, clientIp(req)))) {
       return Response.json(
         { error: "Rate limit reached — try again in an hour." },

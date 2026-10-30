@@ -10,7 +10,12 @@ and scripts but cannot prove that an external app will accept them.
 | --- | --- | --- |
 | Android | YouTube Android intent | Intent-provided HTTPS YouTube URL |
 | iPhone/iPad/iPod | `vnd.youtube://` URL | HTTPS URL after approximately 1.5 seconds |
+| iPad with a desktop-class (Mac) User-Agent | `vnd.youtube://` URL | HTTPS URL after approximately 1.5 seconds |
 | Desktop or unknown | HTTPS YouTube URL | Manual link on the page |
+
+iPadOS 13 and later Safari identify as a Mac by default. The handoff script
+treats a `Macintosh` User-Agent that reports more than one touch point
+(`navigator.maxTouchPoints`) as an iPad; Macs report zero.
 
 ## Release test matrix
 
@@ -24,6 +29,7 @@ changes. Record device/OS/app versions and the date in the release notes.
 | TikTok embedded browser, video | Required | Required | Opens app or usable web fallback |
 | Safari/Chrome mobile, app installed | Required | Required | Opens correct video/channel |
 | Safari/Chrome mobile, app absent | Required | Required | Opens `youtube.com` |
+| iPad Safari (default desktop-class site), app installed | Required | n/a | Opens correct video/channel in the app |
 | Desktop browser | Required | Required | Opens `youtube.com` |
 | Subscribe-confirmation channel | Required | Required | Preserves intended channel and parameter |
 | Tracked short link | Required | Required | Redirects and increments aggregate stats |

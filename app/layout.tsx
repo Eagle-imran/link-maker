@@ -1,15 +1,25 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Instrument_Sans } from "next/font/google";
+
+const sans = Instrument_Sans({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Link Maker — open YouTube links in the app",
+  title: "Link Maker: YouTube links that open in the app",
   description:
-    "Turn any YouTube link into a smart link that opens the YouTube app instead of the in-app browser. More subscribers, more engagement.",
+    "Make a YouTube link that opens the YouTube app instead of the Instagram or TikTok browser, so viewers can subscribe, like and comment.",
 };
+
+export const viewport: Viewport = { themeColor: "#000000" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={sans.variable}>
       <body>{children}</body>
     </html>
   );
