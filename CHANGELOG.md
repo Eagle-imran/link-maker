@@ -22,8 +22,8 @@ The format follows the principles of Keep a Changelog.
 - The stats page leads with the total click count and labels devices in plain
   terms.
 - Clarified that click tracking is optional and aggregate-only.
-- Marked implementation specifications as historical records rather than
-  canonical current documentation.
+- Consolidated the documentation into five short guides under `docs/` and
+  removed the historical design specs and plans.
 
 ### Fixed
 
@@ -35,4 +35,4 @@ The format follows the principles of Keep a Changelog.
 ## Earlier development
 
 The initial smart-link generator and later tracked-link implementation predate
-this changelog. Their historical design records remain under `docs/superpowers/`.
+this changelog. Their design records are in the git history before this change.

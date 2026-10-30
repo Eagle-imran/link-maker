@@ -1,92 +1,68 @@
 # Link Maker
 
-Turn a YouTube URL into a smart link that attempts to open the native YouTube
-app instead of a social app's embedded browser.
+Instagram and TikTok open links in their own browser, where viewers aren't
+signed in to YouTube, so they can't subscribe, like or comment. Link Maker turns
+a YouTube link into one that opens the YouTube app instead.
 
-**Live application:** <https://link-maker-mu.vercel.app>
+**Live:** <https://link-maker-mu.vercel.app>
 
-## What it does
+## Using it
 
-- Accepts YouTube videos, Shorts, live-video URLs, channel handles, and channel
-  IDs.
-- Creates direct smart links without an account or database.
-- Optionally creates a short link with aggregate click counts, a 30-day chart,
-  and an Android/iOS/desktop split.
-- Falls back to `youtube.com` when app handoff is unavailable.
+1. Paste a YouTube video, Short, live or channel link.
+2. Copy your new link and put it in your bio, stories or captions.
 
-Tracking is opt-in. Direct `/v/` and `/c/` links do not record clicks. Tracked
-`/s/` links store aggregate counters only; see
-[Privacy and security](docs/privacy-and-security.md) for the precise data
-handling model.
+If the viewer doesn't have the YouTube app, the link opens youtube.com.
 
-## Supported inputs
+**Ask viewers to subscribe** (channels only) adds YouTube's subscribe prompt.
+It appears in desktop browsers; in the app, viewers land on your channel.
 
-| Input | Example | Output route |
-| --- | --- | --- |
-| Video | `youtube.com/watch?v=dQw4w9WgXcQ` | `/v/dQw4w9WgXcQ` |
-| Short URL | `youtu.be/dQw4w9WgXcQ` | `/v/dQw4w9WgXcQ` |
-| Short or live video | `youtube.com/shorts/...`, `youtube.com/live/...` | `/v/{videoId}` |
-| Channel handle | `youtube.com/@MrBeast` | `/c/@MrBeast` |
-| Channel ID | `youtube.com/channel/UC...` | `/c/{channelId}` |
-| Any supported input with tracking | Created through the UI or API | `/s/{code}` |
+**Track clicks** makes a short `/s/` link plus a private stats page showing total
+clicks, a 30-day chart and the split by device. Anyone with the stats link can
+see the stats, and a lost stats link can't be recovered. The site remembers
+your links under **Your links**, in that browser only.
 
-Playlists, custom slugs, editing, and server-side link deletion are not
-currently supported.
+## Supported links
 
-## Quick start
+| You paste | You get |
+| --- | --- |
+| `youtube.com/watch?v=…`, `youtu.be/…`, `/shorts/…`, `/live/…` | `/v/{videoId}` |
+| `youtube.com/@handle` | `/c/@handle` |
+| `youtube.com/channel/UC…` | `/c/{channelId}` |
+| Any of the above, with click tracking | `/s/{code}` |
 
-Prerequisites:
+Playlists, custom short codes, editing links and deleting links aren't
+supported.
 
-- Node.js 20 or newer
-- npm
-- Upstash Redis only if you want to create or use tracked links
+## Run it locally
+
+Requires Node.js 20+. Redis is only needed for tracked links.
 
 ```bash
 git clone https://github.com/Eagle-imran/link-maker.git
 cd link-maker
 npm ci
-cp .env.example .env.local
-npm run dev
+cp .env.example .env.local   # add Redis credentials here for tracked links
+npm run dev                  # http://localhost:3000
 ```
-
-Open <http://localhost:3000>. Untracked links work without Redis credentials.
-Tracked link creation, resolution, and stats require one of the Redis variable
-pairs documented in [Configuration](docs/reference/configuration.md).
-
-## Development commands
 
 ```bash
-npm run dev      # Local development server
-npm test         # Vitest suite
-npm run build    # Type-check and production build
-npm start        # Run an existing production build
+npm test             # unit and route tests (no network or Redis needed)
+npm run build        # type-check and production build
+npm run docs:check   # check links between docs
 ```
 
-## Documentation
+## Docs
 
-Start at the [documentation index](docs/README.md):
+- [How it works](docs/how-it-works.md): redirects, tracked links, data and design decisions
+- [Routes and API](docs/api.md): every URL, the link API and configuration
+- [Development](docs/development.md): setup, tests and troubleshooting
+- [Operations](docs/operations.md): deploying, release checks and incidents
+- [Privacy and security](docs/privacy-and-security.md): what is stored and why
+- [Contributing](CONTRIBUTING.md), [Security policy](SECURITY.md), [Changelog](CHANGELOG.md)
 
-- [Architecture overview](docs/architecture/overview.md)
-- [Route and API reference](docs/reference/routes.md)
-- [Development setup](docs/development/setup.md)
-- [Deployment guide](docs/operations/deployment.md)
-- [Privacy and security](docs/privacy-and-security.md)
-- [Contributing](CONTRIBUTING.md)
-- [Security policy](SECURITY.md)
-
-## Technology
-
-Next.js App Router, React, TypeScript, Vitest, and optional Upstash Redis,
+Built with Next.js, React, TypeScript, Vitest and optional Upstash Redis, and
 deployed on Vercel.
-
-## Project status
-
-The service is usable, but native-app handoff is controlled partly by mobile
-operating systems and embedded browsers. Validate redirect changes against the
-[manual compatibility matrix](docs/product/browser-compatibility.md) before a
-production release.
 
 ## License
 
-No open-source license has been selected. Copyright remains with the repository
-owner unless a license is added.
+No license has been chosen yet. Copyright remains with the repository owner.
