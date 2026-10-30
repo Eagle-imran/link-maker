@@ -29,6 +29,8 @@ The format follows the principles of Keep a Changelog.
 
 - iPads using the default desktop-class Safari User-Agent now open the YouTube
   app instead of youtube.com. Their tracked clicks are still counted as desktop.
+- Creating a tracked link without Redis configured now returns the documented
+  `503` JSON error instead of crashing with a `500`.
 
 ## Earlier development
 

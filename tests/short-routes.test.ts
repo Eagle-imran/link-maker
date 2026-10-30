@@ -58,6 +58,27 @@ describe("POST /api/links", () => {
       (await createReq({ url: "https://youtu.be/dQw4w9WgXcQ" }, "9.9.9.9")).status
     ).toBe(200);
   });
+
+  it("returns a JSON 503 when Redis isn't configured", async () => {
+    setRedisForTesting(null);
+    const names = [
+      "UPSTASH_REDIS_REST_URL",
+      "UPSTASH_REDIS_REST_TOKEN",
+      "KV_REST_API_URL",
+      "KV_REST_API_TOKEN",
+    ];
+    const saved = names.map((n) => process.env[n]);
+    names.forEach((n) => delete process.env[n]);
+    try {
+      const res = await createReq({ url: "https://youtu.be/dQw4w9WgXcQ" });
+      expect(res.status).toBe(503);
+      expect((await res.json()).error).toContain("Tracking is unavailable");
+    } finally {
+      names.forEach((n, i) => {
+        if (saved[i] !== undefined) process.env[n] = saved[i];
+      });
+    }
+  });
 });
 
 function shortReq(code: string, ua = "Mozilla/5.0 (Linux; Android 14)") {
