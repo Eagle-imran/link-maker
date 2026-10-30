@@ -49,7 +49,7 @@ export default function Home() {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     return target.kind === "video"
       ? `${origin}/v/${target.id}`
-      : `${origin}/c/${target.id}${sub ? "?sub=1" : ""}`;
+      : `${origin}${target.id.startsWith("@") ? "" : "/c"}/${target.id}${sub ? "?sub=1" : ""}`;
   }, [target, sub]);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function Home() {
         body: JSON.stringify({ url: input, sub }),
       });
     } catch {
-      setApiError("Couldn't reach Link Maker. Check your connection and try again.");
+      setApiError("Couldn't reach ytopen. Check your connection and try again.");
       setCreating(false);
       return;
     }
@@ -143,7 +143,7 @@ export default function Home() {
           sign in first. Many just scroll on.
         </p>
         <p className="value">
-          Link Maker sends every click straight to the YouTube app, where
+          ytopen sends every click straight to the YouTube app, where
           viewers are already signed in. Subscribing, liking and commenting
           take one tap.
         </p>
@@ -339,7 +339,7 @@ export default function Home() {
             </div>
             <div className="compare-col after">
               <h3>
-                <YouTubeIcon width={20} />A Link Maker link
+                <YouTubeIcon width={20} />A ytopen link
               </h3>
               <ul>
                 <li>Opens in the YouTube app</li>
@@ -371,7 +371,7 @@ export default function Home() {
           Free to use. Links don&apos;t track viewers unless you turn on click
           tracking, and even then only totals are kept.
         </p>
-        <p>Link Maker isn&apos;t affiliated with YouTube or Google.</p>
+        <p>ytopen isn&apos;t affiliated with YouTube or Google.</p>
       </footer>
     </main>
   );

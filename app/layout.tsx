@@ -10,7 +10,7 @@ const sans = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Link Maker: stop losing subscribers from your bio link",
+  title: "ytopen: stop losing subscribers from your bio link",
   description:
     "Make YouTube links that open in the YouTube app instead of the Instagram or TikTok browser, so viewers are already signed in and can subscribe, like and comment in one tap.",
 };

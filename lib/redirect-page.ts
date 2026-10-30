@@ -75,7 +75,7 @@ export function renderFallbackPage(): string {
     `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
     `<meta name="viewport" content="width=device-width,initial-scale=1">` +
     `<meta name="robots" content="noindex">` +
-    `<title>Link Maker</title>` +
+    `<title>ytopen</title>` +
     `<style>${PAGE_STYLE}</style>` +
     `</head><body><p>This link isn&#39;t valid.</p>` +
     `<a href="https://www.youtube.com">Go to YouTube</a></body></html>`

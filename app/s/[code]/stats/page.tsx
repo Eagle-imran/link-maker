@@ -127,7 +127,7 @@ export default async function StatsPage({
         </div>
       </section>
 
-      <footer>Counts are totals only. Link Maker doesn&apos;t record who clicked.</footer>
+      <footer>Counts are totals only. ytopen doesn&apos;t record who clicked.</footer>
     </main>
   );
 }
