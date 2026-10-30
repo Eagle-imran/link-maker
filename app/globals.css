@@ -53,7 +53,8 @@ a { color: inherit; }
 
 /* Hero */
 
-.hero { padding: 72px 0 40px; }
+.hero { padding: 64px 0 40px; }
+.hero .yt-icon { display: block; margin-bottom: 28px; }
 
 .hero h1 {
   margin: 0 0 24px;
@@ -65,6 +66,15 @@ a { color: inherit; }
 }
 
 .lede { margin: 0; max-width: 34em; color: var(--silver); font-size: 1.125rem; }
+.value {
+  margin: 20px 0 0;
+  max-width: 30em;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+}
 
 /* Maker */
 
@@ -218,6 +228,36 @@ a { color: inherit; }
   .block { grid-template-columns: 180px 1fr; gap: 32px; }
 }
 
+/* Regular link vs Link Maker link */
+
+.compare {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+@media (min-width: 520px) {
+  .compare { grid-template-columns: 1fr 1fr; }
+}
+.compare-col { padding: 18px 20px; border-radius: 18px; }
+.compare-col h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.compare-col ul { margin: 0; padding: 0; list-style: none; }
+.compare-col li { padding: 5px 0; font-size: 0.95rem; line-height: 1.4; }
+.compare-col.before { border: 1px dashed var(--line-strong); color: var(--smoke); }
+.compare-col.before h3 { color: var(--silver); }
+.compare-col.after {
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015));
+  color: var(--paper);
+}
+
 .steps { margin: 0 0 16px; padding: 0; list-style: none; counter-reset: step; }
 .steps li {
   counter-increment: step;
@@ -277,6 +317,7 @@ footer {
   color: var(--smoke);
   font-size: 0.875rem;
 }
+footer p { margin: 0 0 6px; }
 
 /* Stats page */
 

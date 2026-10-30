@@ -10,9 +10,9 @@ const sans = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Link Maker: YouTube links that open in the app",
+  title: "Link Maker: stop losing subscribers from your bio link",
   description:
-    "Make a YouTube link that opens the YouTube app instead of the Instagram or TikTok browser, so viewers can subscribe, like and comment.",
+    "Make YouTube links that open in the YouTube app instead of the Instagram or TikTok browser, so viewers are already signed in and can subscribe, like and comment in one tap.",
 };
 
 export const viewport: Viewport = { themeColor: "#000000" };

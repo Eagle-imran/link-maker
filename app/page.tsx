@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { parseYouTubeUrl } from "@/lib/youtube";
-import { Brand } from "./brand";
+import { Brand, YouTubeIcon } from "./brand";
 
 type SavedLink = {
   code: string;
@@ -135,11 +135,17 @@ export default function Home() {
       <Brand />
 
       <section className="hero">
-        <h1>YouTube links that open in the app.</h1>
+        <YouTubeIcon width={56} />
+        <h1>Your bio link is losing you subscribers.</h1>
         <p className="lede">
-          Instagram and TikTok open links in their own browser, where viewers
-          aren&apos;t signed in to YouTube. A Link Maker link opens the YouTube
-          app instead, so subscribing, liking and commenting take one tap.
+          Instagram and TikTok open YouTube links in their own browser, where
+          viewers aren&apos;t signed in. Tap Subscribe and YouTube asks them to
+          sign in first. Many just scroll on.
+        </p>
+        <p className="value">
+          Link Maker sends every click straight to the YouTube app, where
+          viewers are already signed in. Subscribing, liking and commenting
+          take one tap.
         </p>
       </section>
 
@@ -316,23 +322,56 @@ export default function Home() {
       )}
 
       <section className="block">
+        <h2>Open the app, not a browser</h2>
+        <div>
+          <p>
+            Same video, same viewer. The only difference is where the link
+            opens.
+          </p>
+          <div className="compare">
+            <div className="compare-col before">
+              <h3>A regular YouTube link</h3>
+              <ul>
+                <li>Opens in the Instagram or TikTok browser</li>
+                <li>Viewer is signed out</li>
+                <li>Subscribing means signing in first</li>
+              </ul>
+            </div>
+            <div className="compare-col after">
+              <h3>
+                <YouTubeIcon width={20} />A Link Maker link
+              </h3>
+              <ul>
+                <li>Opens in the YouTube app</li>
+                <li>Viewer is already signed in</li>
+                <li>Subscribing takes one tap</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="block">
         <h2>How it works</h2>
         <div>
           <ol className="steps">
-            <li>Paste a link to a video, Short or channel.</li>
+            <li>Paste a link to a video, Short, live stream or channel.</li>
             <li>Copy your new link.</li>
-            <li>Put it in your bio, stories and captions.</li>
+            <li>Share it in your bio, stories, captions and DMs.</li>
           </ol>
           <p className="fine">
-            Without the YouTube app, the link opens youtube.com instead, so it
-            always goes somewhere.
+            No YouTube app? The link opens youtube.com instead, so it always
+            works.
           </p>
         </div>
       </section>
 
       <footer>
-        Free to use. Links don&apos;t track viewers unless you turn on click
-        tracking, and even then only totals are kept.
+        <p>
+          Free to use. Links don&apos;t track viewers unless you turn on click
+          tracking, and even then only totals are kept.
+        </p>
+        <p>Link Maker isn&apos;t affiliated with YouTube or Google.</p>
       </footer>
     </main>
   );

@@ -19,6 +19,9 @@ The format follows the principles of Keep a Changelog.
 - Redesigned the site in black and graphite with the Instrument Sans typeface,
   and rewrote the page copy. The finished link is now shown large, and saved
   links are listed under Your links.
+- The homepage now leads with the problem (bio links open signed out, so
+  viewers can't easily subscribe), shows the YouTube icon, and compares a
+  regular link with a Link Maker link.
 - The stats page leads with the total click count and labels devices in plain
   terms.
 - Clarified that click tracking is optional and aggregate-only.
