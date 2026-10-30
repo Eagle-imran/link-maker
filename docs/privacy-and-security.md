@@ -1,82 +1,55 @@
 # Privacy and security
 
-This document describes the application's implemented behavior. It is a
-technical notice, not legal advice or a substitute for a jurisdiction-specific
-privacy policy.
+This describes what the app does. It isn't a legal privacy policy.
 
-## Direct links
+## What is stored
 
-Direct `/v/` and `/c/` routes do not write application analytics or visitor
-identifiers to Redis. They return redirect HTML that points only to fixed
-YouTube destinations.
+| Data | Where | How long |
+| --- | --- | --- |
+| Direct links (`/v/`, `/c/`) | Nowhere | — |
+| Tracked link target and stats key | Redis `link:{code}` | Forever |
+| Click counts: total, per UTC day, and Android, iOS or desktop | Redis `clicks:{code}` | Forever |
+| Link creator's IP, as a rate-limit counter | Redis `ratelimit:{ip}` | One hour |
+| **Your links** list | The creator's browser (`localStorage`) | Until removed or site data is cleared |
 
-Infrastructure providers may still process ordinary request metadata in their
-service logs. Consult the configured hosting and Redis providers when preparing
-a public legal notice.
+For clicks, Link Maker stores only counts. It doesn't store IPs, User-Agents,
+referrers, cookies, locations or individual click records, and counts aren't
+deduplicated. Device type is worked out from the User-Agent and then discarded.
 
-## Tracked links
+The rate-limit counter uses the first address in `x-forwarded-for`, which
+Vercel sets. Self-hosting behind another proxy needs the same guarantee.
 
-Each successful `/s/{code}` request attempts to store:
+Removing a link from **Your links** only removes it from that browser. The
+short link keeps working.
 
-- one aggregate total increment;
-- one aggregate increment for the current UTC day; and
-- one aggregate Android, iOS, or desktop/unknown increment.
+Vercel and Upstash may keep their own request logs.
 
-Device class is derived from the User-Agent header. The application does not
-store the raw User-Agent, referrer, visitor IP, cookie identifier, country, or a
-per-visitor event record with those counters. Counts are not deduplicated.
+## Stats links
 
-## Creator IP rate limiting
+The `key` in a stats link is the only thing protecting the stats:
 
-`POST /api/links` stores a counter whose Redis key contains the first address
-from `x-forwarded-for`. Its intended TTL is one hour. This data is used only to
-limit link creation and is not joined to click statistics.
+- Anyone with the full link can see that link's counts.
+- It can't be recovered, changed or revoked.
+- It can show up in browser history and server logs.
 
-The header trust model assumes Vercel overwrites `x-forwarded-for`. Other
-deployments must configure a trusted proxy or revisit the rate limiter.
+The stats page asks search engines not to index it and sends no referrer, but
+those only reduce leaks. Never put a real stats link in docs, issues or
+screenshots.
 
-## Browser-local data
+## Protections
 
-The generator saves up to 50 tracked-link entries in `localStorage` under
-`linkmaker:links`. Entries include the code, public short URL, private stats
-URL, target label, and creation time. They remain on that browser until removed
-or site storage is cleared and are not synchronized by Link Maker.
+- Only YouTube hosts and correctly shaped video IDs, handles and channel IDs are
+  accepted, so links can't redirect anywhere else.
+- Redis keys are only built from codes that pass format checks.
+- A wrong stats key and a missing link look identical.
+- Redirect pages disable MIME sniffing and send no referrer.
+- Codes and keys come from cryptographic random bytes, and new links can't
+  overwrite existing ones.
+- A failure while counting a click never breaks the redirect.
 
-## Stats authorization
+## Limitations
 
-The `key` in a stats URL is a bearer credential:
-
-- Anyone with the complete URL can view that link's aggregate statistics.
-- The key cannot be recovered, rotated, or revoked through the application.
-- Query strings can appear in browser history and provider logs.
-- The stats page uses `noindex` and `Referrer-Policy: no-referrer` to reduce
-  discovery and onward leakage; these are defense-in-depth, not authentication.
-
-Never put a real stats URL in documentation, analytics, support tickets,
-screenshots, or public issue reports.
-
-## Retention
-
-Tracked link records and click counters currently have no expiry. Creation-IP
-counters are intended to expire after one hour. See
-[Data lifecycle](operations/data-retention.md) for complete limitations.
-
-## Security controls
-
-- Strict allowlists validate YouTube hosts and target identifier shapes.
-- Redirect destinations use fixed YouTube URL patterns, preventing arbitrary
-  open redirects.
-- Path-derived Redis keys require a valid short-code format.
-- Stats pages return the same not-found view for absent links and wrong keys.
-- Redirect responses disable MIME sniffing and referrer transmission.
-- Link records use collision-safe `SET NX` creation with cryptographic random
-  bytes.
-- Deferred analytics errors cannot break a resolved redirect.
-
-## Known limitations
-
-- Secret-URL authorization is weaker than an account-based access model.
-- Click counters and rate-limit expiry updates are not transactional.
-- There is no application-level deletion, key rotation, or link revocation.
-- Automated traffic can be counted as clicks.
-- Device classification is intentionally coarse and User-Agent based.
+- A secret link is weaker protection than a login.
+- Bots can be counted as clicks.
+- Click counters and the rate-limit expiry aren't updated atomically.
+- There's no way in the app to delete a link or revoke a stats key.

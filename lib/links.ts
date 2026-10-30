@@ -109,7 +109,7 @@ export async function recordClick(
   if (!CODE_RE.test(code)) return; // never build redis keys from unvalidated input
   const key = `clicks:${code}`;
   // Three independent increments: partial failure can desync total vs breakdowns.
-  // Accepted for aggregate-only stats; Task 3's adapter may pipeline these.
+  // Accepted for aggregate-only stats.
   await Promise.all([
     redis.hincrby(key, "total", 1),
     redis.hincrby(key, `d:${todayUTC()}`, 1),

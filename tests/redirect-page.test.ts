@@ -17,10 +17,8 @@ describe("renderRedirectPage", () => {
     expect(html).toContain("intent://www.youtube.com/watch?v=dQw4w9WgXcQ");
   });
 
-  it("has the manual fallback link and iOS timer", () => {
+  it("has the manual fallback link", () => {
     expect(html).toContain("Tap here if nothing happens");
-    expect(html).toContain("setTimeout");
-    expect(html).toContain("pagehide");
   });
 
   it("is small", () => {
@@ -63,7 +61,14 @@ describe("renderRedirectPage", () => {
 /** Runs the page's inline script against a fake browser and reports where it navigated. */
 function runHandoff(html: string, ua: string, maxTouchPoints = 0) {
   const script = html.match(/<script>([\s\S]*)<\/script>/)![1];
-  const nav: { href?: string; replaced?: string; timer: boolean } = { timer: false };
+  const nav: {
+    href?: string;
+    replaced?: string;
+    fallback?: () => void;
+    cancelled: boolean;
+    listeners: Record<string, () => void>;
+  } = { cancelled: false, listeners: {} };
+  const listen = (type: string, fn: () => void) => { nav.listeners[type] = fn; };
   const location = {
     set href(v: string) { nav.href = v; },
     replace(v: string) { nav.replaced = v; },
@@ -71,10 +76,10 @@ function runHandoff(html: string, ua: string, maxTouchPoints = 0) {
   new Function("navigator", "location", "document", "window", "setTimeout", "clearTimeout", script)(
     { userAgent: ua, maxTouchPoints },
     location,
-    { addEventListener() {}, hidden: false },
-    { addEventListener() {} },
-    () => { nav.timer = true; return 0; },
-    () => {}
+    { addEventListener: listen, hidden: true },
+    { addEventListener: listen },
+    (fn: () => void) => { nav.fallback = fn; return 1; },
+    () => { nav.cancelled = true; }
   );
   return nav;
 }
@@ -83,6 +88,7 @@ describe("client handoff", () => {
   const html = renderRedirectPage(videoT);
   const IOS = "vnd.youtube://www.youtube.com/watch?v=dQw4w9WgXcQ";
   const WEB = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+  const IPHONE_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)";
   const MAC_UA =
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15";
 
@@ -92,15 +98,24 @@ describe("client handoff", () => {
   });
 
   it("sends iPhone to the app with a timed fallback", () => {
-    const nav = runHandoff(html, "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)", 5);
+    const nav = runHandoff(html, IPHONE_UA, 5);
     expect(nav.href).toBe(IOS);
-    expect(nav.timer).toBe(true);
+    nav.fallback!();
+    expect(nav.href).toBe(WEB);
+  });
+
+  it("cancels the fallback when the app takes over", () => {
+    for (const event of ["pagehide", "visibilitychange"]) {
+      const nav = runHandoff(html, IPHONE_UA, 5);
+      nav.listeners[event]();
+      expect(nav.cancelled).toBe(true);
+    }
   });
 
   it("sends an iPad with a desktop-class UA to the app", () => {
     const nav = runHandoff(html, MAC_UA, 5);
     expect(nav.href).toBe(IOS);
-    expect(nav.timer).toBe(true);
+    expect(nav.fallback).toBeDefined();
   });
 
   it("keeps a real Mac on the web", () => {

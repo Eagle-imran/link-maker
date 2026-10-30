@@ -19,11 +19,14 @@ The format follows the principles of Keep a Changelog.
 - Redesigned the site in black and graphite with the Instrument Sans typeface,
   and rewrote the page copy. The finished link is now shown large, and saved
   links are listed under Your links.
+- The homepage now leads with the problem (bio links open signed out, so
+  viewers can't easily subscribe), shows the YouTube icon, and compares a
+  regular link with a Link Maker link.
 - The stats page leads with the total click count and labels devices in plain
   terms.
 - Clarified that click tracking is optional and aggregate-only.
-- Marked implementation specifications as historical records rather than
-  canonical current documentation.
+- Consolidated the documentation into five short guides under `docs/` and
+  removed the historical design specs and plans.
 
 ### Fixed
 
@@ -35,4 +38,4 @@ The format follows the principles of Keep a Changelog.
 ## Earlier development
 
 The initial smart-link generator and later tracked-link implementation predate
-this changelog. Their historical design records remain under `docs/superpowers/`.
+this changelog. Their design records are in the git history before this change.
