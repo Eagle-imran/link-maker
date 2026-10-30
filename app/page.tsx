@@ -8,7 +8,7 @@ import { LinkResult } from "./_home/link-result";
 import { YourLinks } from "./_home/your-links";
 import { loadSaved, persistSaved, type SavedLink } from "./_home/saved-links";
 import { useCopy } from "./_home/use-copy";
-import { SponsorRail } from "./_home/sponsor-rail";
+import { SponsorRail, SPONSORS_ON } from "./_home/sponsor-rail";
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -22,6 +22,8 @@ export default function Home() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [saved, setSaved] = useState<SavedLink[]>([]);
   const { copied, copy, reset: resetCopied } = useCopy();
+  // Known only in the browser, so the first render matches the server's.
+  const [canPaste, setCanPaste] = useState(false);
 
   const target = useMemo(() => parseYouTubeUrl(input), [input]);
   const showError = input.trim() !== "" && target === null;
@@ -36,7 +38,17 @@ export default function Home() {
 
   useEffect(() => {
     setSaved(loadSaved());
+    setCanPaste(typeof navigator.clipboard?.readText === "function");
   }, []);
+
+  async function pasteLink() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text.trim()) setInput(text.trim());
+    } catch {
+      // Permission denied or nothing to read; the field still takes a paste.
+    }
+  }
 
   useEffect(() => {
     resetCopied();
@@ -93,31 +105,39 @@ export default function Home() {
   }
 
   return (
-    <div className="home">
-      <SponsorRail side="left" />
+    <div className={SPONSORS_ON ? "home with-sponsors" : "home"}>
+      {SPONSORS_ON && <SponsorRail side="left" />}
       <main className="wrap">
         <Brand />
         <Hero />
 
         <section className="maker" aria-label="Make a link">
-          <label className="field">
-            <span>YouTube link</span>
-            <input
-              type="url"
-              inputMode="url"
-              placeholder="Paste a video or channel link"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              aria-invalid={showError}
-              aria-describedby={showError ? "url-error" : undefined}
-              autoFocus
-            />
-          </label>
+          <div className="field">
+            <label htmlFor="yt-input">YouTube link</label>
+            <div className="field-box">
+              <input
+                id="yt-input"
+                type="url"
+                inputMode="url"
+                placeholder="Paste a link or type @handle"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                aria-invalid={showError}
+                aria-describedby={showError ? "url-error" : undefined}
+                autoFocus
+              />
+              {canPaste && input === "" && (
+                <button type="button" className="btn quiet paste" onClick={pasteLink}>
+                  Paste
+                </button>
+              )}
+            </div>
+          </div>
 
           {showError && (
             <p className="error" id="url-error" role="alert">
-              This isn&apos;t a YouTube video or channel link. Playlists
-              aren&apos;t supported.
+              This isn&apos;t a YouTube video link, channel link or @handle.
+              Playlists aren&apos;t supported.
             </p>
           )}
 
@@ -163,6 +183,8 @@ export default function Home() {
               copied={copied === "plain"}
               onCopy={() => copy(link, "plain")}
               qr
+              share
+              tryIt
             />
           )}
 
@@ -191,6 +213,7 @@ export default function Home() {
                 copied={copied === "short"}
                 onCopy={() => copy(created.shortUrl, "short")}
                 qr
+                share
               />
               <LinkResult
                 label="Stats page, private"
@@ -216,7 +239,7 @@ export default function Home() {
         />
         <Explainer />
       </main>
-      <SponsorRail side="right" />
+      {SPONSORS_ON && <SponsorRail side="right" />}
     </div>
   );
 }

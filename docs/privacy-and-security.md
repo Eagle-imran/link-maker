@@ -22,6 +22,10 @@ Vercel sets. Self-hosting behind another proxy needs the same guarantee.
 Removing a link from **Your links** only removes it from that browser. The
 short link keeps working.
 
+The site's own pages (the homepage, not the links viewers tap or stats pages)
+load Vercel Web Analytics. It counts page views without cookies; Vercel
+describes what it collects in its own documentation.
+
 Vercel and Upstash may keep their own request logs.
 
 ## Stats links

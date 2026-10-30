@@ -54,11 +54,11 @@ a { color: inherit; }
 }
 .brand-yt { color: var(--smoke); }
 
-/* Sponsor tiles beside the homepage, on wide screens only */
+/* Sponsor tiles beside the homepage, on wide screens only (behind a flag) */
 
 .rail { display: none; }
 @media (min-width: 1240px) {
-  .home { display: grid; grid-template-columns: 1fr minmax(0, 720px) 1fr; gap: 24px; }
+  .home.with-sponsors { display: grid; grid-template-columns: 1fr minmax(0, 720px) 1fr; gap: 24px; }
   .rail {
     display: flex;
     flex-direction: column;
@@ -109,7 +109,8 @@ a { color: inherit; }
 .maker { display: flex; flex-direction: column; gap: 18px; }
 
 .field { display: flex; flex-direction: column; gap: 10px; }
-.field > span { font-size: 0.95rem; color: var(--silver); }
+.field > label { font-size: 0.95rem; color: var(--silver); }
+.field-box { position: relative; }
 
 .field input {
   width: 100%;
@@ -126,6 +127,8 @@ a { color: inherit; }
 .field input::placeholder { color: var(--smoke); }
 .field input:focus { border-color: var(--paper); background: rgba(255, 255, 255, 0.06); }
 .field input[aria-invalid="true"] { border-color: var(--error); }
+.field-box .btn.paste { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); padding: 8px 14px; font-size: 0.85rem; }
+.field-box:has(.paste) input { padding-right: 96px; }
 
 .error { margin: 0; color: var(--error); font-size: 0.95rem; }
 
@@ -180,7 +183,13 @@ a { color: inherit; }
 }
 .result + .result { margin-top: -6px; }
 
-.result-label { display: block; margin-bottom: 6px; color: var(--smoke); font-size: 0.9rem; }
+.result.has-qr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: start; }
+.result-main { min-width: 0; }
+.has-qr .result-row { flex-direction: column; align-items: flex-start; gap: 14px; }
+.result-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+.result-label { color: var(--smoke); font-size: 0.9rem; }
+.try-it { color: var(--silver); font-size: 0.9rem; text-underline-offset: 3px; }
+.try-it:hover { color: var(--paper); }
 
 .result-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .result-actions { display: flex; flex-shrink: 0; gap: 8px; }
@@ -188,26 +197,19 @@ a { color: inherit; }
   .result-row { flex-wrap: wrap; }
 }
 
-/* QR code, opened from a result */
+/* QR code, top right of a result */
 
-.qr {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line);
-  animation: reveal 0.25s ease-out;
-}
-.qr-image { width: 168px; padding: 6px; line-height: 0; background: #fff; border-radius: 14px; }
+.qr { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.qr-image { width: 92px; padding: 4px; line-height: 0; background: #fff; border-radius: 10px; }
 .qr-image svg { display: block; width: 100%; height: auto; }
-.qr-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.qr-actions .fine { margin: 0; }
+.qr-downloads { display: flex; gap: 12px; font-size: 0.8rem; }
+.qr-downloads a { color: var(--smoke); text-decoration: none; letter-spacing: 0.04em; }
+.qr-downloads a:hover { color: var(--paper); }
+@media (max-width: 519px) { .qr-image { width: 72px; } }
 
 .result-url {
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   font-size: clamp(1.2rem, 4.2vw, 1.6rem);
   font-weight: 500;
   font-stretch: 85%;

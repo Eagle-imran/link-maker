@@ -4,7 +4,7 @@ import QRCode from "qrcode";
 // Dark on white with a quiet zone: what phone cameras scan most reliably.
 const OPTIONS = { margin: 2, errorCorrectionLevel: "M" as const };
 
-/** A QR code for `url`, with PNG and SVG downloads for print. */
+/** A small QR code for `url`, with PNG and SVG downloads beneath it. */
 export function QrCode({ url }: { url: string }) {
   const [svg, setSvg] = useState("");
   const [png, setPng] = useState("");
@@ -39,18 +39,22 @@ export function QrCode({ url }: { url: string }) {
         // Generated locally by the qrcode library from our own URL.
         dangerouslySetInnerHTML={{ __html: svg }}
       />
-      <div className="qr-actions">
-        <a className="btn quiet" href={png} download={`${name}.png`}>
-          Download PNG
+      <div className="qr-downloads">
+        <a
+          href={png}
+          download={`${name}.png`}
+          aria-label="Download QR code as PNG"
+        >
+          PNG
         </a>
         <a
-          className="btn quiet"
           href={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`}
           download={`${name}.svg`}
+          aria-label="Download QR code as SVG, sharp at any size for print"
+          title="Sharp at any size, for print"
         >
-          Download SVG
+          SVG
         </a>
-        <p className="fine">SVG stays sharp at any size, for print.</p>
       </div>
     </div>
   );

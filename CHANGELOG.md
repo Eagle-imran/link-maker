@@ -9,8 +9,14 @@ The format follows the principles of Keep a Changelog.
 
 ### Added
 
-- Every finished link has a QR code button. It shows the code and downloads
-  it as a PNG or as an SVG that stays sharp in print.
+- Type a bare `@handle` instead of pasting the channel link.
+- A Paste button fills the link field from the clipboard, and on phones a
+  Share button opens the share sheet. Plain links have a **Try it** link to
+  test them first.
+- Vercel Web Analytics counts visits to the site's own pages. It's cookieless,
+  skips stats pages, and never runs on the links viewers tap.
+- Every finished link shows a small QR code in its top right, with PNG and
+  SVG downloads beneath it. The SVG stays sharp in print.
 - Canonical product, development, architecture, API, privacy, security,
   deployment, and operations documentation.
 - Safe Redis environment template and Node.js development baseline.
@@ -18,8 +24,9 @@ The format follows the principles of Keep a Changelog.
 
 ### Changed
 
-- The logo now sits larger in the center of the header. Wide screens show
-  blank sponsor tiles on both sides of the homepage, ready to fill.
+- The logo now sits larger in the center of the header. Blank sponsor tiles
+  beside the homepage are ready to fill, hidden until `NEXT_PUBLIC_SPONSORS`
+  is set to `on`.
 - Channel links show the channel in chat previews: the title reads
   "@handle on YouTube" with a share card that has the handle on it. Sharing
   the homepage now shows a preview image too.
