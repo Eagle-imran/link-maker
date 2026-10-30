@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getRedis } from "@/lib/redis";
 import { getLink, getStats, buildDailySeries, type LinkStats } from "@/lib/links";
 import { webUrl, type Target, VIDEO_ID_RE, HANDLE_RE, CHANNEL_ID_RE } from "@/lib/youtube";
+import { Brand } from "@/app/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -10,10 +11,15 @@ export const metadata: Metadata = { referrer: "no-referrer", robots: { index: fa
 function NotFound() {
   return (
     <main className="wrap">
-      <h1>Stats not found</h1>
-      <p className="tagline">
-        Check that you opened the full stats URL, including its key.
-      </p>
+      <Brand />
+      <section className="stats-hero">
+        <h1>No stats found</h1>
+        <p>
+          Open the full stats page link, including the part after{" "}
+          <span className="nowrap">?key=</span>. You can find it under Your links
+          on the device where you made the link.
+        </p>
+      </section>
     </main>
   );
 }
@@ -53,8 +59,11 @@ export default async function StatsPage({
   if (!stats) {
     return (
       <main className="wrap">
-        <h1>Link stats</h1>
-        <p className="tagline">Stats are temporarily unavailable — try again in a minute.</p>
+        <Brand />
+        <section className="stats-hero">
+          <h1>Stats are unavailable</h1>
+          <p>Your link still works. Reload this page in a minute to see clicks.</p>
+        </section>
       </main>
     );
   }
@@ -64,46 +73,61 @@ export default async function StatsPage({
   const target: Target = { kind: link.kind, id: link.id };
   const targetUrl = webUrl(target, link.sub);
 
+  const label =
+    target.kind === "video" ? "Video" : link.sub ? `${link.id}, with subscribe prompt` : link.id;
+
   return (
     <main className="wrap">
-      <h1>Link stats</h1>
-      <p className="tagline">
-        <code>/s/{code}</code> → <a href={targetUrl} rel="noreferrer">{targetUrl}</a>
+      <Brand />
+
+      <section className="stats-hero">
+        <h1>Clicks</h1>
+        <p>
+          On /s/{code}, which opens{" "}
+          <a href={targetUrl} rel="noreferrer">
+            {label === "Video" ? targetUrl.replace(/^https:\/\//, "") : label}
+          </a>
+        </p>
+      </section>
+
+      <p className="total">
+        <strong>{stats.total.toLocaleString("en")}</strong>
+        <span>{stats.total === 1 ? "click in total" : "clicks in total"}</span>
       </p>
 
-      <section className="stat-grid">
+      <section className="stat-grid" aria-label="Clicks by device">
         <div className="stat">
-          <strong>{stats.total}</strong>
-          <span>total clicks</span>
-        </div>
-        <div className="stat">
-          <strong>{stats.devices.android}</strong>
-          <span>Android</span>
-        </div>
-        <div className="stat">
-          <strong>{stats.devices.ios}</strong>
+          <strong>{stats.devices.ios.toLocaleString("en")}</strong>
           <span>iOS</span>
         </div>
         <div className="stat">
-          <strong>{stats.devices.desktop}</strong>
-          <span>Desktop</span>
+          <strong>{stats.devices.android.toLocaleString("en")}</strong>
+          <span>Android</span>
+        </div>
+        <div className="stat">
+          <strong>{stats.devices.desktop.toLocaleString("en")}</strong>
+          <span>Computer and other</span>
         </div>
       </section>
 
-      <section className="info">
+      <section className="block">
         <h2>Last 30 days</h2>
-        <div className="chart" role="img" aria-label="Daily clicks, last 30 days">
-          {series.map((d) => (
-            <div key={d.date} className="bar-col" title={`${d.date}: ${d.count}`}>
-              <div className="bar" style={{ height: `${(d.count / max) * 100}%` }} />
-            </div>
-          ))}
-        </div>
-        <div className="chart-labels">
-          <span>{series[0].date}</span>
-          <span>{series[series.length - 1].date}</span>
+        <div>
+          <div className="chart" role="img" aria-label="Clicks per day for the last 30 days">
+            {series.map((d) => (
+              <div key={d.date} className="bar-col" title={`${d.date}: ${d.count}`}>
+                <div className="bar" style={{ height: `${(d.count / max) * 100}%` }} />
+              </div>
+            ))}
+          </div>
+          <div className="chart-labels">
+            <span>{series[0].date}</span>
+            <span>{series[series.length - 1].date} (UTC)</span>
+          </div>
         </div>
       </section>
+
+      <footer>Counts are totals only. Link Maker doesn&apos;t record who clicked.</footer>
     </main>
   );
 }
