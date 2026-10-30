@@ -5,7 +5,8 @@
 | File | Job |
 | --- | --- |
 | `app/page.tsx` | The homepage: parses the pasted link, builds direct links, requests tracked links |
-| `app/_home/` | Homepage pieces: the link result with its QR code (made in the browser), **Your links** and its `localStorage` store, the copy button and the page sections |
+| `app/_home/` | Homepage pieces: the link result with its QR code (made in the browser), Share and Try it, **Your links** and its `localStorage` store, the copy button, the page sections and the sponsor tiles (off unless `NEXT_PUBLIC_SPONSORS=on`) |
+| `app/site-analytics.tsx` | Vercel Web Analytics for the site's pages, skipping stats pages |
 | `lib/youtube.ts` | Validates YouTube links and builds the web, iOS and Android destination URLs |
 | `lib/redirect-page.ts` | Builds the tiny redirect page and its headers |
 | `app/v/`, `app/c/` | Direct video and channel links |

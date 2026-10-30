@@ -35,6 +35,10 @@ describe("parseYouTubeUrl — channels", () => {
     });
   });
 
+  it("accepts a bare @handle", () => {
+    expect(parseYouTubeUrl("  @MrBeast ")).toEqual({ kind: "channel", id: "@MrBeast" });
+  });
+
   it("parses channel-ID URLs", () => {
     const id = "UCX6OQ3DkcsbYNE6H8uQQuVA";
     expect(parseYouTubeUrl(`https://youtube.com/channel/${id}`)).toEqual({
@@ -58,6 +62,9 @@ describe("parseYouTubeUrl — rejects", () => {
     ["https://www.youtube.com/watch"], // no v param
     ["https://www.youtube.com/"],
     ["https://www.youtube.com/@x"], // handle too short (<3)
+    ["@x"],
+    ["@two words"],
+    ["@MrBeast/videos"],
     ["https://www.youtube.com/channel/notAChannelId"],
     ["https://www.youtube.com/playlist?list=PL123"],
   ])("returns null for %s", (input) => {

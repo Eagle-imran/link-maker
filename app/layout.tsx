@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Instrument_Sans } from "next/font/google";
+import { SiteAnalytics } from "./site-analytics";
 
 const sans = Instrument_Sans({
   subsets: ["latin"],
@@ -29,7 +30,10 @@ export const viewport: Viewport = { themeColor: "#000000" };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={sans.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <SiteAnalytics />
+      </body>
     </html>
   );
 }

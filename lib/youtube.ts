@@ -16,6 +16,8 @@ const YT_HOSTS = new Set([
 export function parseYouTubeUrl(input: string): Target | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
+  // A bare handle, typed instead of pasting the channel URL.
+  if (trimmed.startsWith("@")) return channel(trimmed);
 
   let url: URL;
   try {

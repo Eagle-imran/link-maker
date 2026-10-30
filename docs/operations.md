@@ -2,7 +2,7 @@
 
 ## Deploying
 
-The site is the Vercel project `link-maker`, connected to
+The site is the Vercel project `yt-open`, connected to
 `Eagle-imran/link-maker`.
 
 - Every push to `main` deploys to production.
@@ -20,6 +20,17 @@ Release steps:
 
 To roll back, promote the previous deployment in Vercel. Rolling back doesn't
 change Redis data, so keep stored-link formats backward compatible.
+
+## Switches
+
+| Variable | Effect |
+| --- | --- |
+| `NEXT_PUBLIC_SPONSORS=on` | Shows the sponsor tiles beside the homepage on wide screens. Off when unset. |
+
+Set it in Vercel under Settings › Environment Variables, then redeploy: the
+value is read when the site is built.
+
+Vercel Web Analytics is turned on in the Vercel project's Analytics tab.
 
 ## Before releasing a redirect change
 

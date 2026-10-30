@@ -1,3 +1,7 @@
+/** Sponsor tiles are off unless NEXT_PUBLIC_SPONSORS is "on" when the site is
+ * built. On Vercel: set it under Settings → Environment Variables, then redeploy. */
+export const SPONSORS_ON = process.env.NEXT_PUBLIC_SPONSORS === "on";
+
 /** Sponsor slots per side. Blank for now; fill a slot by giving it content. */
 const SLOTS = 3;
 
