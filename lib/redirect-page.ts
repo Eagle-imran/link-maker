@@ -34,7 +34,8 @@ export function renderRedirectPage(target: Target, sub = false): string {
   const script =
     `(function(){var ua=navigator.userAgent,web=${JSON.stringify(web)};` +
     `if(/Android/i.test(ua)){location.href=${JSON.stringify(intent)};}` +
-    `else if(/iPhone|iPad|iPod/.test(ua)){` +
+    // iPadOS 13+ Safari sends a Mac UA by default; real Macs report 0 touch points.
+    `else if(/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)){` +
     `var t=setTimeout(function(){location.href=web;},1500);` +
     `var c=function(){clearTimeout(t);};` +
     `document.addEventListener("visibilitychange",function(){if(document.hidden)c();});` +

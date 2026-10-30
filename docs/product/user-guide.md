@@ -34,7 +34,8 @@ otherwise securely save important stats URLs.
 
 Counts are best-effort rather than billing-grade analytics. Deferred writes can
 fail, automated clients may be counted, and device classification is based on
-the request's User-Agent header.
+the request's User-Agent header. iPads that request the desktop-class site
+(the iPadOS Safari default) are counted as desktop.
 
 ## Subscribe confirmation
 

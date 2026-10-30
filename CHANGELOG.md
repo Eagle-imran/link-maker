@@ -20,6 +20,11 @@ The format follows the principles of Keep a Changelog.
 - Marked implementation specifications as historical records rather than
   canonical current documentation.
 
+### Fixed
+
+- iPads using the default desktop-class Safari User-Agent now open the YouTube
+  app instead of youtube.com. Their tracked clicks are still counted as desktop.
+
 ## Earlier development
 
 The initial smart-link generator and later tracked-link implementation predate
