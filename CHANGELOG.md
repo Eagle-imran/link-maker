@@ -9,6 +9,8 @@ The format follows the principles of Keep a Changelog.
 
 ### Added
 
+- Every finished link has a QR code button. It shows the code and downloads
+  it as a PNG or as an SVG that stays sharp in print.
 - Canonical product, development, architecture, API, privacy, security,
   deployment, and operations documentation.
 - Safe Redis environment template and Node.js development baseline.
@@ -16,6 +18,11 @@ The format follows the principles of Keep a Changelog.
 
 ### Changed
 
+- The logo now sits larger in the center of the header. Wide screens show
+  blank sponsor tiles on both sides of the homepage, ready to fill.
+- Channel links show the channel in chat previews: the title reads
+  "@handle on YouTube" with a share card that has the handle on it. Sharing
+  the homepage now shows a preview image too.
 - Renamed the site to ytopen (now at ytopen.vercel.app) with a new logo: a
   play arrow leaving a frame.
 - Channel links made from an `@handle` are shorter: `/@handle` instead of

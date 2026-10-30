@@ -22,6 +22,7 @@ export async function GET(
     return htmlResponse(renderFallbackPage());
   }
 
-  const sub = new URL(req.url).searchParams.get("sub") === "1";
-  return htmlResponse(renderRedirectPage({ kind: "channel", id: handle }, sub));
+  const url = new URL(req.url);
+  const sub = url.searchParams.get("sub") === "1";
+  return htmlResponse(renderRedirectPage({ kind: "channel", id: handle }, sub, url.origin));
 }

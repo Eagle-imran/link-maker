@@ -4,7 +4,8 @@
 
 | File | Job |
 | --- | --- |
-| `app/page.tsx` | The homepage: parses the pasted link, builds direct links, requests tracked links, keeps **Your links** in `localStorage` |
+| `app/page.tsx` | The homepage: parses the pasted link, builds direct links, requests tracked links |
+| `app/_home/` | Homepage pieces: the link result with its QR code (made in the browser), **Your links** and its `localStorage` store, the copy button and the page sections |
 | `lib/youtube.ts` | Validates YouTube links and builds the web, iOS and Android destination URLs |
 | `lib/redirect-page.ts` | Builds the tiny redirect page and its headers |
 | `app/v/`, `app/c/` | Direct video and channel links |
@@ -31,8 +32,10 @@ Since iPadOS 13, Safari tells sites it's a Mac. The script treats a "Mac" that
 reports touch points (`navigator.maxTouchPoints > 1`) as an iPad. Real Macs
 report zero.
 
-The page also has Open Graph tags, so chat apps show a preview with the video
-thumbnail. Invalid links get a fallback page that links to youtube.com, with
+The page also has Open Graph tags, so chat apps show a preview: the video
+thumbnail for videos, and for `@handle` channels a card from `/og?c=@handle`
+with the handle on it (`lib/og-card.tsx`). The homepage's own share image is
+`app/opengraph-image.tsx`. Invalid links get a fallback page that links to youtube.com, with
 HTTP `200`.
 
 Destinations are always built from a validated ID dropped into a fixed YouTube

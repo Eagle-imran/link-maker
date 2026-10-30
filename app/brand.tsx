@@ -1,25 +1,40 @@
+/** A play arrow leaving a frame: the link breaks out of the in-app browser.
+ * Plain SVG so the share-image renderer (next/og) can draw it too. */
+export function LogoMark({
+  size = 22,
+  tile = "#f4f4f1",
+  ink = "#000",
+}: {
+  size?: number;
+  tile?: string;
+  ink?: string;
+}) {
+  return (
+    <svg viewBox="0 0 64 64" width={size} height={size} aria-hidden="true">
+      <rect width="64" height="64" rx="16" fill={tile} />
+      <path
+        d="M18 28v18h18"
+        fill="none"
+        stroke={ink}
+        strokeWidth="5.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M46 18 40.4 36.4 27.6 23.6z"
+        fill={ink}
+        stroke={ink}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function Brand() {
   return (
     <a className="brand" href="/" aria-label="ytopen home">
-      {/* A play arrow leaving a frame: the link breaks out of the in-app browser. */}
-      <svg viewBox="0 0 64 64" width="22" height="22" aria-hidden="true">
-        <rect width="64" height="64" rx="16" fill="#f4f4f1" />
-        <path
-          d="M18 28v18h18"
-          fill="none"
-          stroke="#000"
-          strokeWidth="5.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M46 18 40.4 36.4 27.6 23.6z"
-          fill="#000"
-          stroke="#000"
-          strokeWidth="4"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <LogoMark size={36} />
       <span>
         <span className="brand-yt">yt</span>open
       </span>
