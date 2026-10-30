@@ -15,7 +15,9 @@ const PAGE_STYLE =
  * Hand-written minimal HTML — deliberately not a React page so the
  * redirect hot path ships ~1 KB with zero framework JS.
  */
-export function renderRedirectPage(target: Target, sub = false): string {
+/** `origin` (e.g. https://ytopen.vercel.app) is needed for the channel share
+ * image, whose og:image must be an absolute URL. */
+export function renderRedirectPage(target: Target, sub = false, origin?: string): string {
   // Defense-in-depth: re-validate target.id
   const { id } = target;
   const isValid =
@@ -46,14 +48,27 @@ export function renderRedirectPage(target: Target, sub = false): string {
     `else{location.replace(web);}})();`;
 
   // Open Graph tags so links pasted in WhatsApp/iMessage/Discord get a real
-  // preview. Video thumbnails are predictable — no API needed.
-  const ogTitle = target.kind === "video" ? "Watch on YouTube" : "Open channel on YouTube";
+  // preview. Video thumbnails are predictable — no API needed. Channel
+  // thumbnails aren't, so handles get a card from /og with the handle on it.
+  const isHandle = target.kind === "channel" && id.startsWith("@");
+  const ogTitle =
+    target.kind === "video"
+      ? "Watch on YouTube"
+      : isHandle
+        ? `${id} on YouTube`
+        : "Open channel on YouTube";
+  const ogImage =
+    target.kind === "video"
+      ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
+      : isHandle && origin
+        ? `${origin}/og?c=${encodeURIComponent(id)}`
+        : null;
   const og =
     `<meta property="og:title" content="${ogTitle}">` +
     `<meta property="og:description" content="Opens in the YouTube app — subscribe, like, and comment.">` +
     `<meta property="og:url" content="${web}">` +
-    (target.kind === "video"
-      ? `<meta property="og:image" content="https://i.ytimg.com/vi/${id}/hqdefault.jpg">` +
+    (ogImage
+      ? `<meta property="og:image" content="${ogImage}">` +
         `<meta name="twitter:card" content="summary_large_image">`
       : "");
 

@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { Target } from "./youtube";
 
-/** Minimal Redis surface used by Link Maker. Injected everywhere so tests
+/** Minimal Redis surface used by ytopen. Injected everywhere so tests
  * can use tests/fake-redis.ts and production uses lib/redis.ts. */
 export interface RedisLike {
   get(key: string): Promise<string | null>;

@@ -26,5 +26,6 @@ export async function GET(
   await deferOrRun(() => recordClick(getRedis(), code, device));
 
   const target: Target = { kind: link.kind, id: link.id };
-  return htmlResponse(renderRedirectPage(target, link.sub), "no-store");
+  const origin = new URL(req.url).origin;
+  return htmlResponse(renderRedirectPage(target, link.sub, origin), "no-store");
 }

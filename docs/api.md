@@ -8,6 +8,7 @@
 | `GET /v/{videoId}` | Redirect page for an 11-character video ID |
 | `GET /@handle` | Redirect page for a channel handle. Same as `/c/@handle`, which still works. `?sub=1` adds YouTube's `sub_confirmation=1` |
 | `GET /c/{@handle or UC…}` | Redirect page for a channel. `?sub=1` adds YouTube's `sub_confirmation=1` |
+| `GET /og?c=@handle` | 1200×630 PNG share card with the handle on it, used as the channel links' `og:image`. Other values get a generic card |
 | `GET /s/{code}` | Tracked redirect for an 8-character code. Counts the click |
 | `GET /s/{code}/stats?key={key}` | Private stats page. Not indexed by search engines |
 

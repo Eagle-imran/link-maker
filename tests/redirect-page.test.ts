@@ -36,13 +36,28 @@ describe("renderRedirectPage", () => {
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
   });
 
-  it("has Open Graph tags without an image for channels", () => {
-    const chanHtml = renderRedirectPage({ kind: "channel", id: "@MrBeast" });
-    expect(chanHtml).toContain(
-      'property="og:title" content="Open channel on YouTube"'
+  it("puts the handle and a share card on @handle channel links", () => {
+    const chanHtml = renderRedirectPage(
+      { kind: "channel", id: "@MrBeast" },
+      false,
+      "https://ytopen.vercel.app"
     );
-    expect(chanHtml).not.toContain("og:image");
-    expect(chanHtml).not.toContain("twitter:card");
+    expect(chanHtml).toContain('property="og:title" content="@MrBeast on YouTube"');
+    expect(chanHtml).toContain(
+      'property="og:image" content="https://ytopen.vercel.app/og?c=%40MrBeast"'
+    );
+    expect(chanHtml).toContain('name="twitter:card" content="summary_large_image"');
+  });
+
+  it("has no image for channel IDs or without an origin", () => {
+    const idHtml = renderRedirectPage(
+      { kind: "channel", id: "UC" + "a".repeat(22) },
+      false,
+      "https://ytopen.vercel.app"
+    );
+    expect(idHtml).toContain('property="og:title" content="Open channel on YouTube"');
+    expect(idHtml).not.toContain("og:image");
+    expect(renderRedirectPage({ kind: "channel", id: "@MrBeast" })).not.toContain("og:image");
   });
 
   it("passes sub through to the URLs", () => {

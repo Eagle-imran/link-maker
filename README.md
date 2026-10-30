@@ -9,7 +9,8 @@ a YouTube link into one that opens the YouTube app instead.
 ## Using it
 
 1. Paste a YouTube video, Short, live or channel link.
-2. Copy your new link and put it in your bio, stories or captions.
+2. Copy your new link and put it in your bio, stories or captions, or
+   download it as a QR code for print.
 
 If the viewer doesn't have the YouTube app, the link opens youtube.com.
 
